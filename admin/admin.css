@@ -148,23 +148,70 @@ dialog::backdrop { background: rgba(28,20,16,0.5); }
   border-radius: 8px;
   background: #faf7f3;
 }
-.image-preview-wrap {
+.image-gallery-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.65rem;
+}
+.image-gallery-item {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
   border-radius: 6px;
   overflow: hidden;
   background: #e8dfd4;
+  border: 1px solid var(--line);
 }
-.image-preview-wrap img {
+.image-gallery-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center 35%;
   display: block;
 }
-.image-preview-empty {
+.image-gallery-item.is-cover {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.image-gallery-item .cover-badge {
   position: absolute;
-  inset: 0;
+  left: 0.35rem;
+  top: 0.35rem;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 99px;
+}
+.image-gallery-actions {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  gap: 0.2rem;
+  padding: 0.3rem;
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+}
+.image-gallery-actions button {
+  flex: 1;
+  border: 0;
+  background: rgba(255,255,255,0.92);
+  color: var(--ink);
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.25rem 0.2rem;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.image-gallery-empty {
+  position: static;
+  min-height: 72px;
+  border-radius: 6px;
+  background: #e8dfd4;
+}
+.image-preview-empty {
   display: grid;
   place-items: center;
   color: var(--muted);
@@ -180,6 +227,24 @@ dialog::backdrop { background: rgba(28,20,16,0.5); }
 .image-upload-status {
   font-size: 0.8rem;
   color: var(--muted);
+}
+.image-url-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+}
+.image-url-row input {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  width: 100%;
+  font: inherit;
+}
+.image-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 500;
 }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem; }
 @media (max-width: 800px) {

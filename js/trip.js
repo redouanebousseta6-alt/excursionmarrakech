@@ -24,13 +24,83 @@ document.addEventListener("DOMContentLoaded", async function () {
   var metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) metaDesc.setAttribute("content", trip.shortDescription);
 
-  document.getElementById("trip-image").src = trip.image;
-  document.getElementById("trip-image").alt = trip.title;
-  document.getElementById("trip-image").onerror = function () {
+  var fallbackImage =
+    "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?auto=format&fit=crop&w=1200&q=80";
+  var galleryImages = (trip.images && trip.images.length
+    ? trip.images
+    : trip.image
+      ? [trip.image]
+      : [fallbackImage]
+  ).filter(Boolean);
+  var galleryIndex = 0;
+  var tripImage = document.getElementById("trip-image");
+  var galleryControls = document.getElementById("trip-gallery-controls");
+  var galleryThumbs = document.getElementById("trip-gallery-thumbs");
+  var galleryCount = document.getElementById("trip-gallery-count");
+  var galleryPrev = document.getElementById("trip-gallery-prev");
+  var galleryNext = document.getElementById("trip-gallery-next");
+
+  function showGalleryImage(index) {
+    if (!galleryImages.length) return;
+    galleryIndex = (index + galleryImages.length) % galleryImages.length;
+    tripImage.src = galleryImages[galleryIndex];
+    tripImage.alt = trip.title + " — photo " + (galleryIndex + 1);
+    if (galleryCount) {
+      galleryCount.textContent = galleryIndex + 1 + " / " + galleryImages.length;
+    }
+    if (galleryThumbs) {
+      galleryThumbs.querySelectorAll("[data-gallery-index]").forEach(function (btn) {
+        var active = Number(btn.getAttribute("data-gallery-index")) === galleryIndex;
+        btn.classList.toggle("is-active", active);
+        btn.setAttribute("aria-selected", active ? "true" : "false");
+      });
+    }
+  }
+
+  tripImage.onerror = function () {
     this.onerror = null;
-    this.src =
-      "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?auto=format&fit=crop&w=1200&q=80";
+    this.src = fallbackImage;
   };
+
+  if (galleryControls) {
+    galleryControls.hidden = galleryImages.length < 2;
+  }
+  if (galleryThumbs && galleryImages.length > 1) {
+    galleryThumbs.innerHTML = galleryImages
+      .map(function (url, i) {
+        return (
+          '<button type="button" class="trip-gallery-thumb" data-gallery-index="' +
+          i +
+          '" role="tab" aria-label="Show photo ' +
+          (i + 1) +
+          '" aria-selected="' +
+          (i === 0 ? "true" : "false") +
+          '">' +
+          '<img src="' +
+          EM.escapeHtml(url) +
+          '" alt="" loading="lazy" />' +
+          "</button>"
+        );
+      })
+      .join("");
+    galleryThumbs.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-gallery-index]");
+      if (!btn) return;
+      showGalleryImage(Number(btn.getAttribute("data-gallery-index")));
+    });
+  }
+  if (galleryPrev) {
+    galleryPrev.addEventListener("click", function () {
+      showGalleryImage(galleryIndex - 1);
+    });
+  }
+  if (galleryNext) {
+    galleryNext.addEventListener("click", function () {
+      showGalleryImage(galleryIndex + 1);
+    });
+  }
+  showGalleryImage(0);
+
   document.getElementById("trip-category").textContent = EM.categoryName(trip.category);
   document.getElementById("trip-title").textContent = trip.title;
   document.getElementById("trip-duration").textContent = trip.duration;
@@ -348,7 +418,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     "@type": ["Product", "TouristTrip"],
     name: trip.title,
     description: trip.shortDescription,
-    image: trip.image,
+    image: galleryImages.length > 1 ? galleryImages : galleryImages[0] || trip.image,
     brand: { "@type": "Brand", name: "excursionmarrakech" },
     touristType: EM.categoryName(trip.category),
     aggregateRating: {

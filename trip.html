@@ -49,6 +49,12 @@
           <img id="trip-image" src="" alt="" width="1600" height="900" fetchpriority="high" />
         </div>
         <div class="trip-hero__overlay" aria-hidden="true"></div>
+        <div class="trip-gallery-controls" id="trip-gallery-controls" hidden>
+          <button type="button" class="trip-gallery-nav" id="trip-gallery-prev" aria-label="Previous image">‹</button>
+          <div class="trip-gallery-thumbs" id="trip-gallery-thumbs" role="tablist" aria-label="Trip photos"></div>
+          <button type="button" class="trip-gallery-nav" id="trip-gallery-next" aria-label="Next image">›</button>
+          <span class="trip-gallery-count" id="trip-gallery-count" aria-live="polite"></span>
+        </div>
         <div class="container trip-hero__content">
           <span class="eyebrow" id="trip-category" style="color: var(--sand)"></span>
           <h1 id="trip-title">Loading…</h1>
