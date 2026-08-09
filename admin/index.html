@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Admin · excursionmarrakech</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div id="login-view" class="login-wrap">
+      <form id="login-form" class="login-card">
+        <h1>excursionmarrakech</h1>
+        <p>Admin dashboard</p>
+        <label>Email<input type="email" name="email" required value="admin@excursionmarrakech.com" autocomplete="username" /></label>
+        <label>Password<input type="password" name="password" required value="Admin123!" autocomplete="current-password" /></label>
+        <button type="submit">Sign in</button>
+        <p id="login-error" class="error" hidden></p>
+        <p class="login-hint">Use <strong>http://localhost:3000/admin/</strong> with <code>npm start</code> running.</p>
+      </form>
+    </div>
+
+    <div id="app-view" class="app is-hidden" hidden>
+      <aside class="sidebar">
+        <div class="brand">excursion<span>marrakech</span></div>
+        <nav>
+          <button type="button" data-view="dashboard" class="nav-btn is-active">Dashboard</button>
+          <button type="button" data-view="trips" class="nav-btn">Excursions</button>
+          <button type="button" data-view="bookings" class="nav-btn">Orders</button>
+          <a href="/" target="_blank" rel="noopener">View store →</a>
+        </nav>
+        <button type="button" id="logout-btn" class="logout">Log out</button>
+      </aside>
+
+      <main class="main">
+        <section id="view-dashboard" class="view">
+          <div class="view-head">
+            <h2>Dashboard</h2>
+            <button type="button" class="btn" data-go-bookings>View all orders</button>
+          </div>
+          <div class="stats" id="stats"></div>
+          <h3 class="subhead">Recent orders</h3>
+          <div id="recent-bookings"></div>
+        </section>
+
+        <section id="view-trips" class="view is-hidden" hidden>
+          <div class="view-head">
+            <h2>Excursions</h2>
+            <button type="button" id="new-trip-btn" class="btn">+ New excursion</button>
+          </div>
+          <div id="trips-table"></div>
+        </section>
+
+        <section id="view-bookings" class="view is-hidden" hidden>
+          <div class="view-head">
+            <h2>Orders & bookings</h2>
+            <select id="booking-filter">
+              <option value="">All statuses</option>
+              <option value="inquiry">Inquiry</option>
+              <option value="pending_payment">Pending payment</option>
+              <option value="paid">Paid</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div id="bookings-table"></div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="trip-dialog">
+      <form id="trip-form" method="dialog">
+        <h3 id="trip-dialog-title">New excursion</h3>
+        <input type="hidden" name="id" />
+        <label>Title<input name="title" required /></label>
+        <label>Category
+          <select name="category" required>
+            <option value="desert">Desert Adventures</option>
+            <option value="day-trips">Day Trips</option>
+            <option value="city">City Tours</option>
+            <option value="wellness">Wellness</option>
+            <option value="multi-day">Multi-day</option>
+          </select>
+        </label>
+        <label>Short description<textarea name="shortDescription" rows="2" required></textarea></label>
+        <label>Full description<textarea name="description" rows="4" required></textarea></label>
+        <div class="row">
+          <label>Duration<input name="duration" placeholder="e.g. Full day" /></label>
+          <label>Duration label<input name="durationLabel" placeholder="e.g. Full day" /></label>
+        </div>
+        <label>Image URL<input name="image" type="url" /></label>
+        <div class="row">
+          <label>Pricing type
+            <select name="pricingType" id="pricing-type">
+              <option value="flat">Flat (per person)</option>
+              <option value="private-group">Private / Group</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" name="featured" /> Featured</label>
+          <label class="check"><input type="checkbox" name="active" checked /> Active</label>
+        </div>
+        <div id="price-flat" class="row">
+          <label>Price (MAD)<input name="flatPrice" type="number" min="0" /></label>
+        </div>
+        <div id="price-pg" class="row" hidden>
+          <label>Private (MAD)<input name="privatePrice" type="number" min="0" /></label>
+          <label>Group (MAD)<input name="groupPrice" type="number" min="0" /></label>
+          <label>Min private<input name="minPrivate" type="number" min="1" /></label>
+        </div>
+        <label>Itinerary (one step per line)<textarea name="itinerary" rows="4"></textarea></label>
+        <label>Included (one item per line)<textarea name="included" rows="3"></textarea></label>
+        <div class="dialog-actions">
+          <button type="button" id="trip-cancel" class="btn btn-ghost">Cancel</button>
+          <button type="submit" class="btn">Save</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="admin.js"></script>
+  </body>
+</html>

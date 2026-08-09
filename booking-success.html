@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Booking confirmed | excursionmarrakech</title>
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a class="logo" href="index.html">excursion<span>marrakech</span></a>
+        <nav class="nav" data-nav>
+          <a href="index.html">Home</a>
+          <a href="trips.html">All Trips</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="section">
+      <div class="container" style="max-width: 640px">
+        <span class="eyebrow">Thank you</span>
+        <h1 id="success-title">We’re confirming your booking</h1>
+        <p id="success-body">Loading booking details…</p>
+        <div id="success-card" class="booking-card" style="margin-top: 1.5rem" hidden>
+          <p><strong>Reference:</strong> <span id="ref"></span></p>
+          <p><strong>Trip:</strong> <span id="trip-name"></span></p>
+          <p><strong>Phone:</strong> <span id="phone"></span></p>
+          <p><strong>Date:</strong> <span id="travel-date"></span></p>
+          <p><strong>Travelers:</strong> <span id="travelers"></span></p>
+          <p><strong>Total:</strong> <span id="total"></span></p>
+          <p><strong>Status:</strong> <span id="status"></span></p>
+        </div>
+        <p style="margin-top: 1.5rem">
+          <a class="btn btn--primary" href="trips.html">Browse more trips</a>
+        </p>
+      </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/tracking.js"></script>
+    <script>
+      (async function () {
+        const params = new URLSearchParams(location.search);
+        const bookingId = params.get("bookingId");
+        const provider = params.get("provider");
+        const token = params.get("token"); // PayPal may return token=ORDER_ID
+
+        await EM.loadConfig();
+        EM.initTracking(EM.config);
+
+        if (provider === "paypal" && (token || params.get("orderId"))) {
+          try {
+            await EM.api("/payments/paypal/capture", {
+              method: "POST",
+              body: JSON.stringify({
+                orderId: token || params.get("orderId"),
+                bookingId,
+              }),
+            });
+          } catch (e) {
+            console.warn(e);
+          }
+        }
+
+        if (bookingId && provider === "stripe") {
+          try {
+            await EM.api("/payments/confirm-session", {
+              method: "POST",
+              body: JSON.stringify({ bookingId, provider: "stripe" }),
+            });
+          } catch (e) {
+            console.warn(e);
+          }
+        }
+
+        if (!bookingId) {
+          document.getElementById("success-body").textContent =
+            "Missing booking reference. Check your email or contact us.";
+          return;
+        }
+
+        try {
+          const b = await EM.api("/bookings/" + encodeURIComponent(bookingId));
+          document.getElementById("success-card").hidden = false;
+          document.getElementById("ref").textContent = b.id;
+          document.getElementById("trip-name").textContent = b.tripTitle;
+          document.getElementById("phone").textContent = b.phone || "—";
+          document.getElementById("travel-date").textContent = b.travelDate;
+          document.getElementById("travelers").textContent = b.travelers;
+          var totalText = Number(b.totalAmount).toLocaleString("fr-MA") + " MAD";
+          if (b.displayCurrency && b.displayCurrency !== "MAD" && b.displayTotal != null) {
+            totalText += " (≈ " + b.displayTotal + " " + b.displayCurrency + ")";
+          }
+          document.getElementById("total").textContent = totalText;
+          document.getElementById("status").textContent = b.status;
+
+          if (b.status === "paid") {
+            document.getElementById("success-title").textContent = "Payment received";
+            document.getElementById("success-body").textContent =
+              "Thank you! Your payment was successful. We’ll email confirmation and trip details shortly.";
+            EM.trackEvent("Purchase", {
+              value: b.totalAmount,
+              currency: "MAD",
+              content_name: b.tripTitle,
+            });
+          } else if (b.status === "inquiry") {
+            document.getElementById("success-title").textContent = "Inquiry received";
+            document.getElementById("success-body").textContent =
+              "Thanks! Our team will confirm availability and get back to you soon.";
+            EM.trackEvent("Lead");
+          } else {
+            document.getElementById("success-body").textContent =
+              "Your booking is being processed. Status: " + b.status;
+          }
+        } catch (e) {
+          document.getElementById("success-body").textContent = e.message;
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>All Marrakech Trips & Excursions | excursionmarrakech</title>
+    <meta
+      name="description"
+      content="Browse and filter Marrakech excursions by category: desert adventures, day trips, city tours, wellness and multi-day Sahara journeys. Transparent Private & Group pricing."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="canonical" href="https://excursionmarrakech.com/trips.html" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a class="logo" href="index.html">excursion<span>marrakech</span></a>
+        <button
+          class="nav-toggle"
+          type="button"
+          data-nav-toggle
+          aria-expanded="false"
+          aria-controls="site-nav"
+          aria-label="Open menu"
+        >
+          <span></span><span></span><span></span>
+        </button>
+        <nav id="site-nav" class="nav" data-nav aria-label="Primary">
+          <a href="index.html" data-page="home">Home</a>
+          <a href="trips.html" data-page="trips">All Trips</a>
+          <a href="about.html" data-page="about">About</a>
+          <a href="trips.html?category=desert">Desert</a>
+          <a class="btn btn--primary" href="trips.html">Book an excursion</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <header class="archive-hero">
+        <div class="container">
+          <span class="eyebrow">Catalogue</span>
+          <h1>All Marrakech excursions</h1>
+          <p>
+            Filter by category to find desert thrills, Atlas day trips, city experiences,
+            wellness rituals and multi-day Sahara journeys.
+          </p>
+        </div>
+      </header>
+
+      <div class="container archive-layout">
+        <aside class="filters" aria-label="Filter trips">
+          <h2>Filter by category</h2>
+          <ul class="filter-list" id="filter-list"></ul>
+        </aside>
+
+        <section aria-labelledby="archive-heading">
+          <div class="archive-toolbar">
+            <h2 id="archive-heading" class="sr-only">Trip listings</h2>
+            <p class="archive-count" id="trips-count">Loading…</p>
+          </div>
+          <div class="trip-grid" id="trips-grid"></div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <a class="logo" href="index.html">excursion<span>marrakech</span></a>
+            <p>Premium excursions and desert tours from Marrakech — desert, Atlas, coast & city.</p>
+          </div>
+          <div>
+            <h3>Explore</h3>
+            <ul>
+              <li><a href="trips.html">All trips</a></li>
+              <li><a href="trips.html?category=desert">Desert adventures</a></li>
+              <li><a href="trips.html?category=day-trips">Day trips</a></li>
+              <li><a href="trips.html?category=wellness">Wellness</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Contact</h3>
+            <ul>
+              <li><a href="tel:+212639996960">+212 639 996 960</a></li>
+              <li><a href="tel:+212624603887">+212 624 603 887</a></li>
+              <li><a href="mailto:silversandstravels@gmail.com">silversandstravels@gmail.com</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span>© 2026 excursionmarrakech</span>
+          <span>
+            <a href="about.html">About</a> ·
+            <a href="privacy.html">Privacy</a> ·
+            <a href="terms-of-use.html">Terms of Use</a> ·
+            <a href="terms-conditions.html">Terms &amp; Conditions</a> ·
+            <a href="/sitemap.xml">Sitemap</a>
+          </span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/data.js" defer></script>
+    <script src="js/currency.js" defer></script>
+    <script src="js/api.js" defer></script>
+    <script src="js/tracking.js" defer></script>
+    <script src="js/app.js" defer></script>
+    <script src="js/trips.js" defer></script>
+  </body>
+</html>
