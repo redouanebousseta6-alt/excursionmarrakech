@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     description:
       (EM.SITE && EM.SITE.tagline) ||
       "Premium Marrakech excursions and desert tours",
-    url: (EM.SITE && EM.SITE.url) || "https://excursionmarrakech.com",
+    url: (EM.SITE && EM.SITE.url) || "https://excursionmarrakech.net",
     telephone: (EM.SITE && EM.SITE.phone) || undefined,
     email: (EM.SITE && EM.SITE.email) || undefined,
     address: {

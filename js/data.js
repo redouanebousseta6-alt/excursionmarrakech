@@ -11,7 +11,7 @@ EM.SITE = {
   phone: "+212 639 996 960",
   phoneAlt: "+212 624 603 887",
   email: "silversandstravels@gmail.com",
-  url: "https://excursionmarrakech.com",
+  url: "https://excursionmarrakech.net",
 };
 
 EM.CATEGORIES = [
