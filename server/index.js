@@ -14,6 +14,39 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const root = path.join(__dirname, "..");
 
+const PAGE_FILES = {
+  trips: "trips.html",
+  about: "about.html",
+  privacy: "privacy.html",
+  "terms-of-use": "terms-of-use.html",
+  "terms-conditions": "terms-conditions.html",
+  "booking-success": "booking-success.html",
+};
+
+const RESERVED_SLUGS = new Set([
+  ...Object.keys(PAGE_FILES),
+  "admin",
+  "api",
+  "css",
+  "js",
+  "data",
+  "node_modules",
+  "server",
+  "assets",
+  "favicon.ico",
+  "robots.txt",
+  "sitemap.xml",
+]);
+
+function sendPage(res, file) {
+  res.sendFile(path.join(root, file));
+}
+
+function withQuery(req) {
+  const idx = req.originalUrl.indexOf("?");
+  return idx === -1 ? "" : req.originalUrl.slice(idx);
+}
+
 // Stripe webhook needs raw body — mount BEFORE json parser
 app.post(
   "/api/payments/stripe/webhook",
@@ -32,17 +65,11 @@ app.use("/api/payments", paymentsRouter);
 app.get("/sitemap.xml", (_req, res) => {
   const site = process.env.SITE_URL || `http://localhost:${PORT}`;
   const trips = db.prepare("SELECT id, updated_at FROM trips WHERE active = 1").all();
-  const staticPages = [
-    "",
-    "/trips.html",
-    "/about.html",
-    "/privacy.html",
-    "/terms-of-use.html",
-    "/terms-conditions.html",
-  ];
+  const staticPages = ["", "/trips", "/about", "/privacy", "/terms-of-use", "/terms-conditions"];
   let urls = staticPages
     .map(
-      (p) => `  <url><loc>${site}${p || "/"}</loc><changefreq>weekly</changefreq><priority>${p ? "0.8" : "1.0"}</priority></url>`
+      (p) =>
+        `  <url><loc>${site}${p || "/"}</loc><changefreq>weekly</changefreq><priority>${p ? "0.8" : "1.0"}</priority></url>`
     )
     .join("\n");
   urls +=
@@ -50,7 +77,7 @@ app.get("/sitemap.xml", (_req, res) => {
     trips
       .map(
         (t) =>
-          `  <url><loc>${site}/trip.html?id=${encodeURIComponent(t.id)}</loc><lastmod>${(t.updated_at || "").slice(0, 10)}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`
+          `  <url><loc>${site}/${encodeURIComponent(t.id)}</loc><lastmod>${(t.updated_at || "").slice(0, 10)}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`
       )
       .join("\n");
 
@@ -96,13 +123,61 @@ app.get("/api/trips/:id/schema", (req, res) => {
       priceCurrency: "MAD",
       price: low,
       availability: "https://schema.org/InStock",
-      url: `${site}/trip.html?id=${trip.id}`,
+      url: `${site}/${encodeURIComponent(trip.id)}`,
     },
   });
 });
 
+// Legacy HTML → clean URLs
+app.get(["/index.html", "/index"], (req, res) => {
+  res.redirect(301, `/${withQuery(req)}`);
+});
+
+app.get("/trip.html", (req, res) => {
+  const id = typeof req.query.id === "string" ? req.query.id.trim() : "";
+  if (id) {
+    const params = new URLSearchParams();
+    Object.entries(req.query).forEach(([key, value]) => {
+      if (key === "id") return;
+      if (Array.isArray(value)) value.forEach((v) => params.append(key, String(v)));
+      else if (value != null) params.set(key, String(value));
+    });
+    const q = params.toString();
+    return res.redirect(301, `/${encodeURIComponent(id)}${q ? `?${q}` : ""}`);
+  }
+  return res.redirect(301, "/trips");
+});
+
+app.get("/terms.html", (req, res) => {
+  res.redirect(301, `/terms-conditions${withQuery(req)}`);
+});
+
+app.get("/:page.html", (req, res, next) => {
+  const page = req.params.page;
+  if (PAGE_FILES[page]) {
+    return res.redirect(301, `/${page}${withQuery(req)}`);
+  }
+  return next();
+});
+
+// Clean page routes
+app.get("/", (_req, res) => sendPage(res, "index.html"));
+
+Object.entries(PAGE_FILES).forEach(([slug, file]) => {
+  app.get(`/${slug}`, (_req, res) => sendPage(res, file));
+});
+
+// Trip detail: /:slug (domain + trip id)
+app.get("/:slug", (req, res, next) => {
+  const slug = req.params.slug;
+  if (RESERVED_SLUGS.has(slug) || slug.includes(".")) return next();
+  const row = db.prepare("SELECT id FROM trips WHERE id = ? AND active = 1").get(slug);
+  if (!row) return next();
+  return sendPage(res, "trip.html");
+});
+
 app.use("/admin", express.static(path.join(root, "admin")));
-app.use(express.static(root));
+app.use(express.static(root, { index: false }));
 
 app.use((req, res) => {
   res.status(404).type("text").send("Not found");

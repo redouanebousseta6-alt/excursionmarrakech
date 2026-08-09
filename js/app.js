@@ -14,15 +14,35 @@
       .replace(/"/g, "&quot;");
   };
 
+  EM.tripUrl = function (id) {
+    return "/" + encodeURIComponent(id);
+  };
+
+  EM.tripsUrl = function (category) {
+    return category ? "/trips?category=" + encodeURIComponent(category) : "/trips";
+  };
+
+  EM.tripIdFromLocation = function () {
+    var params = new URLSearchParams(window.location.search);
+    var fromQuery = params.get("id");
+    if (fromQuery) return fromQuery;
+    var parts = window.location.pathname.replace(/\/+$/, "").split("/").filter(Boolean);
+    if (!parts.length) return null;
+    if (parts[0] === "trip" && parts[1]) return decodeURIComponent(parts[1]);
+    if (parts.length === 1) return decodeURIComponent(parts[0]);
+    return null;
+  };
+
   EM.tripCardHtml = function (trip) {
     var cat = EM.categoryName(trip.category);
+    var href = EM.tripUrl(trip.id);
     var fallback =
       "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?auto=format&fit=crop&w=1200&q=80";
     var rating = EM.ensureRating(trip);
     return (
       '<article class="trip-card">' +
-      '<a class="trip-card__media" href="trip.html?id=' +
-      encodeURIComponent(trip.id) +
+      '<a class="trip-card__media" href="' +
+      href +
       '" aria-label="' +
       EM.escapeHtml(trip.title) +
       '">' +
@@ -50,8 +70,8 @@
       "</span>" +
       "</div>" +
       "<h3>" +
-      '<a href="trip.html?id=' +
-      encodeURIComponent(trip.id) +
+      '<a href="' +
+      href +
       '">' +
       EM.escapeHtml(trip.title) +
       "</a>" +
@@ -63,8 +83,8 @@
       '<span class="trip-card__price">' +
       EM.escapeHtml(EM.priceLabel(trip)) +
       "</span>" +
-      '<a class="trip-card__link" href="trip.html?id=' +
-      encodeURIComponent(trip.id) +
+      '<a class="trip-card__link" href="' +
+      href +
       '">View details →</a>' +
       "</div>" +
       "</div>" +
@@ -205,7 +225,7 @@
     bar.className = "cookie-banner is-visible";
     bar.setAttribute("role", "dialog");
     bar.innerHTML =
-      "<p>We use cookies for essential booking features and, if configured, ad measurement (Meta/Google). See our <a href=\"privacy.html\" style=\"color:#e8c9a0\">Privacy Policy</a>.</p>" +
+      "<p>We use cookies for essential booking features and, if configured, ad measurement (Meta/Google). See our <a href=\"/privacy\" style=\"color:#e8c9a0\">Privacy Policy</a>.</p>" +
       '<button type="button" class="btn btn--primary" data-cookie-ok>Accept</button>';
     document.body.appendChild(bar);
     bar.querySelector("[data-cookie-ok]").addEventListener("click", function () {

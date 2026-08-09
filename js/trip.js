@@ -7,8 +7,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   await EM.loadConfig();
   EM.initTracking(EM.config);
 
-  var params = new URLSearchParams(window.location.search);
-  var id = params.get("id");
+  var id = EM.tripIdFromLocation();
   var trip = id ? await EM.loadTrip(id) : null;
 
   var root = document.getElementById("trip-root");
@@ -262,7 +261,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (!booking || !booking.bookingId) throw new Error("Booking was not saved");
       EM.trackEvent("Lead", { content_name: trip.title });
       window.location.href =
-        "booking-success.html?bookingId=" + encodeURIComponent(booking.bookingId);
+        "/booking-success?bookingId=" + encodeURIComponent(booking.bookingId);
     } catch (err) {
       success.classList.add("is-visible");
       success.textContent =
@@ -321,7 +320,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     dateInput.min = d.toISOString().slice(0, 10);
   }
 
-  if (params.get("cancelled") === "1") {
+  if (new URLSearchParams(window.location.search).get("cancelled") === "1") {
     success.classList.add("is-visible");
     success.textContent = "Payment was cancelled. You can try again or send an inquiry instead.";
   }

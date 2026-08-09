@@ -16,7 +16,7 @@
   <body>
     <header class="site-header">
       <div class="container site-header__inner">
-        <a class="logo" href="index.html">excursion<span>marrakech</span></a>
+        <a class="logo" href="/">excursion<span>marrakech</span></a>
         <button
           class="nav-toggle"
           type="button"
@@ -28,11 +28,11 @@
           <span></span><span></span><span></span>
         </button>
         <nav id="site-nav" class="nav" data-nav aria-label="Primary">
-          <a href="index.html" data-page="home">Home</a>
-          <a href="trips.html" data-page="trips">All Trips</a>
-          <a href="about.html" data-page="about">About</a>
-          <a href="trips.html?category=desert">Desert</a>
-          <a class="btn btn--primary" href="trips.html">Book an excursion</a>
+          <a href="/" data-page="home">Home</a>
+          <a href="/trips" data-page="trips">All Trips</a>
+          <a href="/about" data-page="about">About</a>
+          <a href="/trips?category=desert">Desert</a>
+          <a class="btn btn--primary" href="/trips">Book an excursion</a>
         </nav>
       </div>
     </header>
@@ -40,7 +40,7 @@
     <div id="trip-not-found" class="section container hidden">
       <h1>Trip not found</h1>
       <p>This excursion may have moved. Browse the full catalogue instead.</p>
-      <p><a class="btn btn--primary" href="trips.html">View all trips</a></p>
+      <p><a class="btn btn--primary" href="/trips">View all trips</a></p>
     </div>
 
     <div id="trip-root">
@@ -132,9 +132,9 @@
               </p>
               <p class="form-hint">
                 By booking you agree to our
-                <a href="privacy.html">Privacy Policy</a>,
-                <a href="terms-of-use.html">Terms of Use</a> and
-                <a href="terms-conditions.html">Terms &amp; Conditions</a>.
+                <a href="/privacy">Privacy Policy</a>,
+                <a href="/terms-of-use">Terms of Use</a> and
+                <a href="/terms-conditions">Terms &amp; Conditions</a>.
               </p>
               <div class="form-success" id="form-success" role="status" aria-live="polite"></div>
             </form>
@@ -147,16 +147,16 @@
       <div class="container">
         <div class="footer-grid">
           <div>
-            <a class="logo" href="index.html">excursion<span>marrakech</span></a>
+            <a class="logo" href="/">excursion<span>marrakech</span></a>
             <p>Premium excursions and desert tours from Marrakech — desert, Atlas, coast & city.</p>
           </div>
           <div>
             <h3>Explore</h3>
             <ul>
-              <li><a href="trips.html">All trips</a></li>
-              <li><a href="trips.html?category=desert">Desert adventures</a></li>
-              <li><a href="trips.html?category=day-trips">Day trips</a></li>
-              <li><a href="trips.html?category=wellness">Wellness</a></li>
+              <li><a href="/trips">All trips</a></li>
+              <li><a href="/trips?category=desert">Desert adventures</a></li>
+              <li><a href="/trips?category=day-trips">Day trips</a></li>
+              <li><a href="/trips?category=wellness">Wellness</a></li>
             </ul>
           </div>
           <div>
@@ -171,10 +171,10 @@
         <div class="footer-bottom">
           <span>© 2026 excursionmarrakech</span>
           <span>
-            <a href="about.html">About</a> ·
-            <a href="privacy.html">Privacy</a> ·
-            <a href="terms-of-use.html">Terms of Use</a> ·
-            <a href="terms-conditions.html">Terms &amp; Conditions</a> ·
+            <a href="/about">About</a> ·
+            <a href="/privacy">Privacy</a> ·
+            <a href="/terms-of-use">Terms of Use</a> ·
+            <a href="/terms-conditions">Terms &amp; Conditions</a> ·
             <a href="/sitemap.xml">Sitemap</a>
           </span>
         </div>
