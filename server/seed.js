@@ -49,11 +49,14 @@ function seed() {
       updated_at = datetime('now')
   `);
 
-  const tx = db.transaction((trips) => {
-    for (const trip of trips) upsert.run(tripToRow(trip));
-  });
-
-  tx(EM.TRIPS);
+  db.exec("BEGIN");
+  try {
+    for (const trip of EM.TRIPS) upsert.run(tripToRow(trip));
+    db.exec("COMMIT");
+  } catch (err) {
+    db.exec("ROLLBACK");
+    throw err;
+  }
   console.log(`Seeded ${EM.TRIPS.length} trips`);
 
   const defaults = {
@@ -70,4 +73,16 @@ function seed() {
   console.log("Settings ready");
 }
 
-seed();
+function seedIfEmpty() {
+  const count = db.prepare("SELECT COUNT(*) AS c FROM trips").get().c;
+  if (Number(count) === 0) {
+    console.log("Empty database — seeding defaults...");
+    seed();
+  }
+}
+
+module.exports = { seed, seedIfEmpty };
+
+if (require.main === module) {
+  seed();
+}

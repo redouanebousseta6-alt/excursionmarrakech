@@ -1,15 +1,15 @@
 const fs = require("fs");
 const path = require("path");
-const Database = require("better-sqlite3");
+const { DatabaseSync } = require("node:sqlite");
 
 const dataDir = path.join(__dirname, "..", "data");
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 const dbPath = path.join(dataDir, "store.db");
-const db = new Database(dbPath);
+const db = new DatabaseSync(dbPath);
 
-db.pragma("journal_mode = WAL");
-db.pragma("foreign_keys = ON");
+db.exec("PRAGMA journal_mode = WAL");
+db.exec("PRAGMA foreign_keys = ON");
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS admins (
