@@ -3,9 +3,12 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const { db, rowToTrip } = require("./db");
+const { seedIfEmpty } = require("./seed");
 const { router: apiRouter } = require("./routes");
 const { router: paymentsRouter, stripeWebhookHandler } = require("./payments");
 const { startingPrice, CATEGORIES } = require("./pricing");
+
+seedIfEmpty();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
