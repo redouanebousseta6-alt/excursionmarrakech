@@ -97,8 +97,8 @@ router.post("/stripe/checkout", async (req, res) => {
         tripId: booking.trip_id,
         totalMad: String(booking.total_amount),
       },
-      success_url: `${siteUrl}/booking-success.html?bookingId=${booking.id}&provider=stripe`,
-      cancel_url: `${siteUrl}/trip.html?id=${booking.trip_id}&bookingId=${booking.id}&cancelled=1`,
+      success_url: `${siteUrl}/booking-success?bookingId=${booking.id}&provider=stripe`,
+      cancel_url: `${siteUrl}/${encodeURIComponent(booking.trip_id)}?bookingId=${booking.id}&cancelled=1`,
     });
 
     db.prepare(`
@@ -194,8 +194,8 @@ router.post("/paypal/create-order", async (req, res) => {
         application_context: {
           brand_name: "excursionmarrakech",
           user_action: "PAY_NOW",
-          return_url: `${process.env.SITE_URL || "http://localhost:3000"}/booking-success.html?bookingId=${booking.id}&provider=paypal`,
-          cancel_url: `${process.env.SITE_URL || "http://localhost:3000"}/trip.html?id=${booking.trip_id}&cancelled=1`,
+          return_url: `${process.env.SITE_URL || "http://localhost:3000"}/booking-success?bookingId=${booking.id}&provider=paypal`,
+          cancel_url: `${process.env.SITE_URL || "http://localhost:3000"}/${encodeURIComponent(booking.trip_id)}?cancelled=1`,
         },
       }),
     });

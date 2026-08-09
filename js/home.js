@@ -30,8 +30,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         var img = c.image || defaults[c.id] || defaults.desert;
         var desc = c.description || "";
         return (
-          '<a class="cat-card" href="trips.html?category=' +
-          encodeURIComponent(c.id) +
+          '<a class="cat-card" href="' +
+          EM.tripsUrl(c.id) +
           '">' +
           '<img src="' +
           EM.escapeHtml(img) +
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     reviewsGrid.innerHTML = EM.REVIEWS.map(function (review) {
       var trip = EM.getTrip(review.tripId);
       var tripTitle = trip ? trip.title : "Marrakech excursion";
-      var tripHref = trip ? "trip.html?id=" + encodeURIComponent(trip.id) : "trips.html";
+      var tripHref = trip ? EM.tripUrl(trip.id) : "/trips";
       return (
         '<blockquote class="review-card">' +
         '<div class="review-card__top">' +
