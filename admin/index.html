@@ -91,7 +91,23 @@
           <label>Duration<input name="duration" placeholder="e.g. Full day" /></label>
           <label>Duration label<input name="durationLabel" placeholder="e.g. Full day" /></label>
         </div>
-        <label>Image URL<input name="image" type="url" /></label>
+        <div class="image-field">
+          <span class="field-label">Cover image</span>
+          <div class="image-upload">
+            <div class="image-preview-wrap">
+              <img id="image-preview" alt="Cover preview" hidden />
+              <span id="image-preview-empty" class="image-preview-empty">No image selected</span>
+            </div>
+            <div class="image-upload-actions">
+              <input type="file" id="image-file" accept="image/jpeg,image/png,image/webp,image/gif" hidden />
+              <button type="button" id="image-pick-btn" class="btn btn-ghost">Upload from computer</button>
+              <span id="image-upload-status" class="image-upload-status" aria-live="polite"></span>
+            </div>
+            <label>Or image URL
+              <input name="image" id="image-url" type="text" placeholder="https://… or /uploads/…" />
+            </label>
+          </div>
+        </div>
         <div class="row">
           <label>Pricing type
             <select name="pricingType" id="pricing-type">
