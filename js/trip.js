@@ -198,20 +198,13 @@ document.addEventListener("DOMContentLoaded", async function () {
   var travelersInput = document.getElementById("travelers");
   if (travelersInput) travelersInput.addEventListener("input", updatePriceDisplay);
 
-  // Payment buttons visibility
+  // Payment buttons are hidden for now (inquiry booking only)
   var payStripe = document.getElementById("pay-stripe");
   var payPaypal = document.getElementById("pay-paypal");
-  if (payStripe) payStripe.hidden = !(EM.config.paymentsEnabled && EM.config.paymentsEnabled.stripe);
-  if (payPaypal) payPaypal.hidden = !(EM.config.paymentsEnabled && EM.config.paymentsEnabled.paypal);
   var payHint = document.getElementById("pay-hint");
-  if (
-    payHint &&
-    EM.config.paymentsEnabled &&
-    !EM.config.paymentsEnabled.stripe &&
-    !EM.config.paymentsEnabled.paypal
-  ) {
-    payHint.hidden = false;
-  }
+  if (payStripe) payStripe.hidden = true;
+  if (payPaypal) payPaypal.hidden = true;
+  if (payHint) payHint.hidden = true;
 
   async function createBooking(mode) {
     var formEl = document.getElementById("booking-form");
@@ -271,7 +264,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           : err.message);
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Request Booking (inquiry)";
+        submitBtn.textContent = "Request Booking";
       }
     }
   });

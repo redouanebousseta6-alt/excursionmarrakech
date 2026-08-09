@@ -99,7 +99,7 @@
 
               <div class="form-group">
                 <label for="email">Email</label>
-                <input id="email" name="email" type="email" autocomplete="email" required placeholder="you@email.com" />
+                <input id="email" name="email" type="email" autocomplete="email" required placeholder="your.name@gmail.com" />
               </div>
 
               <div id="phone-field-mount"></div>
@@ -116,20 +116,8 @@
 
               <p class="booking-total" id="display-total">Total: —</p>
 
-              <button class="btn btn--primary btn--full" type="submit">Request Booking (inquiry)</button>
+              <button class="btn btn--primary btn--full" type="submit">Request Booking</button>
 
-              <div class="pay-actions">
-                <button class="btn btn--majorelle btn--full" type="button" id="pay-stripe" hidden>
-                  Pay with card (Stripe)
-                </button>
-                <button class="btn btn--secondary btn--full" type="button" id="pay-paypal" hidden>
-                  Pay with PayPal
-                </button>
-              </div>
-
-              <p id="pay-hint" class="form-hint" hidden>
-                Online payments activate once Stripe/PayPal keys are added in <code>.env</code>. Inquiry booking still works.
-              </p>
               <p class="form-hint">
                 By booking you agree to our
                 <a href="/privacy">Privacy Policy</a>,
