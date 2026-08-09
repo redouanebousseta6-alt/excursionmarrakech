@@ -798,8 +798,13 @@ h3,
   padding: 1.25rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  position: sticky;
-  top: calc(var(--nav-h) + 1rem);
+}
+
+@media (min-width: 900px) {
+  .filters {
+    position: sticky;
+    top: calc(var(--nav-h) + 1rem);
+  }
 }
 
 .filters h2 {
