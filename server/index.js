@@ -105,7 +105,7 @@ app.use((req, res) => {
   res.status(404).type("text").send("Not found");
 });
 
-app.listen(PORT, () => {
-  console.log(`excursionmarrakech running at http://localhost:${PORT}`);
-  console.log(`Admin panel: http://localhost:${PORT}/admin/`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`excursionmarrakech running on port ${PORT}`);
+  console.log(`Admin panel: /admin/`);
 });
