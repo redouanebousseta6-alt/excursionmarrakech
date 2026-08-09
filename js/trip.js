@@ -34,7 +34,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   ).filter(Boolean);
   var galleryIndex = 0;
   var tripImage = document.getElementById("trip-image");
-  var galleryControls = document.getElementById("trip-gallery-controls");
+  var galleryBar = document.getElementById("trip-gallery-controls");
+  var galleryNavs = document.getElementById("trip-gallery-navs");
   var galleryThumbs = document.getElementById("trip-gallery-thumbs");
   var galleryCount = document.getElementById("trip-gallery-count");
   var galleryPrev = document.getElementById("trip-gallery-prev");
@@ -62,10 +63,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     this.src = fallbackImage;
   };
 
-  if (galleryControls) {
-    galleryControls.hidden = galleryImages.length < 2;
-  }
-  if (galleryThumbs && galleryImages.length > 1) {
+  var hasGallery = galleryImages.length > 1;
+  if (galleryBar) galleryBar.hidden = !hasGallery;
+  if (galleryNavs) galleryNavs.hidden = !hasGallery;
+  if (galleryThumbs && hasGallery) {
     galleryThumbs.innerHTML = galleryImages
       .map(function (url, i) {
         return (
