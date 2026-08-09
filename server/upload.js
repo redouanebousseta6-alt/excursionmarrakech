@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 8 * 1024 * 1024 },
+  limits: { fileSize: 8 * 1024 * 1024, files: 12 },
   fileFilter: (_req, file, cb) => {
     if (!ALLOWED_MIME.has(file.mimetype)) {
       return cb(new Error("Only JPEG, PNG, WebP, or GIF images are allowed"));
@@ -30,20 +30,28 @@ const upload = multer({
 });
 
 function uploadTripImage(req, res) {
-  upload.single("image")(req, res, (err) => {
+  upload.fields([
+    { name: "images", maxCount: 12 },
+    { name: "image", maxCount: 1 },
+  ])(req, res, (err) => {
     if (err) {
-      const msg = err instanceof multer.MulterError
-        ? err.code === "LIMIT_FILE_SIZE"
-          ? "Image must be 8MB or smaller"
-          : err.message
-        : err.message || "Upload failed";
+      const msg =
+        err instanceof multer.MulterError
+          ? err.code === "LIMIT_FILE_SIZE"
+            ? "Each image must be 8MB or smaller"
+            : err.code === "LIMIT_FILE_COUNT"
+              ? "You can upload up to 12 images at once"
+              : err.message
+          : err.message || "Upload failed";
       return res.status(400).json({ error: msg });
     }
-    if (!req.file) return res.status(400).json({ error: "No image file uploaded" });
+    const files = [...(req.files?.images || []), ...(req.files?.image || [])];
+    if (!files.length) return res.status(400).json({ error: "No image file uploaded" });
+    const urls = files.map((file) => `/uploads/${file.filename}`);
     return res.json({
-      url: `/uploads/${req.file.filename}`,
-      filename: req.file.filename,
-      size: req.file.size,
+      urls,
+      url: urls[0],
+      files: files.map((file) => ({ filename: file.filename, size: file.size, url: `/uploads/${file.filename}` })),
     });
   });
 }

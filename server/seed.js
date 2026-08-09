@@ -23,11 +23,11 @@ function seed() {
   const upsert = db.prepare(`
     INSERT INTO trips (
       id, title, short_description, description, category, duration, duration_label,
-      featured, image, tags_json, itinerary_json, included_json, pricing_json,
+      featured, image, images_json, tags_json, itinerary_json, included_json, pricing_json,
       rating, review_count, active
     ) VALUES (
       @id, @title, @short_description, @description, @category, @duration, @duration_label,
-      @featured, @image, @tags_json, @itinerary_json, @included_json, @pricing_json,
+      @featured, @image, @images_json, @tags_json, @itinerary_json, @included_json, @pricing_json,
       @rating, @review_count, @active
     )
     ON CONFLICT(id) DO UPDATE SET
@@ -39,6 +39,7 @@ function seed() {
       duration_label = excluded.duration_label,
       featured = excluded.featured,
       image = excluded.image,
+      images_json = excluded.images_json,
       tags_json = excluded.tags_json,
       itinerary_json = excluded.itinerary_json,
       included_json = excluded.included_json,

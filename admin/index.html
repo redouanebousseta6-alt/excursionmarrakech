@@ -92,20 +92,20 @@
           <label>Duration label<input name="durationLabel" placeholder="e.g. Full day" /></label>
         </div>
         <div class="image-field">
-          <span class="field-label">Cover image</span>
+          <span class="field-label">Gallery images</span>
           <div class="image-upload">
-            <div class="image-preview-wrap">
-              <img id="image-preview" alt="Cover preview" hidden />
-              <span id="image-preview-empty" class="image-preview-empty">No image selected</span>
-            </div>
+            <ul id="image-gallery-list" class="image-gallery-list"></ul>
+            <p id="image-gallery-empty" class="image-preview-empty image-gallery-empty">No images yet — upload or add a URL</p>
             <div class="image-upload-actions">
-              <input type="file" id="image-file" accept="image/jpeg,image/png,image/webp,image/gif" hidden />
+              <input type="file" id="image-file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden />
               <button type="button" id="image-pick-btn" class="btn btn-ghost">Upload from computer</button>
               <span id="image-upload-status" class="image-upload-status" aria-live="polite"></span>
             </div>
-            <label>Or image URL
-              <input name="image" id="image-url" type="text" placeholder="https://… or /uploads/…" />
-            </label>
+            <div class="image-url-row">
+              <input id="image-url" type="text" placeholder="https://… or /uploads/…" />
+              <button type="button" id="image-url-add" class="btn btn-ghost">Add URL</button>
+            </div>
+            <p class="image-hint">First image is the cover on trip cards. Visitors can browse all images on the trip page.</p>
           </div>
         </div>
         <div class="row">

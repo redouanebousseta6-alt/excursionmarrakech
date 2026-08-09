@@ -91,9 +91,30 @@ function addTripCol(name, ddl) {
 }
 addTripCol("rating", "rating REAL NOT NULL DEFAULT 4.8");
 addTripCol("review_count", "review_count INTEGER NOT NULL DEFAULT 24");
+addTripCol("images_json", "images_json TEXT NOT NULL DEFAULT '[]'");
+
+function parseImagesJson(raw) {
+  try {
+    const parsed = JSON.parse(raw || "[]");
+    return Array.isArray(parsed) ? parsed.filter((u) => typeof u === "string" && u.trim()) : [];
+  } catch {
+    return [];
+  }
+}
+
+function normalizeTripImages(trip = {}) {
+  const fromList = Array.isArray(trip.images)
+    ? trip.images.filter((u) => typeof u === "string" && String(u).trim())
+    : [];
+  if (fromList.length) return fromList.map((u) => String(u).trim());
+  if (trip.image) return [String(trip.image).trim()];
+  return [];
+}
 
 function rowToTrip(row) {
   if (!row) return null;
+  const images = parseImagesJson(row.images_json);
+  if (!images.length && row.image) images.push(row.image);
   return {
     id: row.id,
     title: row.title,
@@ -103,7 +124,8 @@ function rowToTrip(row) {
     duration: row.duration,
     durationLabel: row.duration_label,
     featured: !!row.featured,
-    image: row.image,
+    image: images[0] || row.image || "",
+    images,
     tags: JSON.parse(row.tags_json || "[]"),
     itinerary: JSON.parse(row.itinerary_json || "[]"),
     included: JSON.parse(row.included_json || "[]"),
@@ -117,6 +139,7 @@ function rowToTrip(row) {
 }
 
 function tripToRow(trip) {
+  const images = normalizeTripImages(trip);
   return {
     id: trip.id,
     title: trip.title,
@@ -126,7 +149,8 @@ function tripToRow(trip) {
     duration: trip.duration || "",
     duration_label: trip.durationLabel || trip.duration_label || trip.duration || "",
     featured: trip.featured ? 1 : 0,
-    image: trip.image || "",
+    image: images[0] || trip.image || "",
+    images_json: JSON.stringify(images),
     tags_json: JSON.stringify(trip.tags || []),
     itinerary_json: JSON.stringify(trip.itinerary || []),
     included_json: JSON.stringify(trip.included || []),
@@ -137,4 +161,4 @@ function tripToRow(trip) {
   };
 }
 
-module.exports = { db, rowToTrip, tripToRow, dbPath };
+module.exports = { db, rowToTrip, tripToRow, dbPath, normalizeTripImages };

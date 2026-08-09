@@ -231,7 +231,8 @@ router.post("/admin/trips", requireAdmin, (req, res) => {
     duration: body.duration || "",
     durationLabel: body.durationLabel || body.duration || "",
     featured: !!body.featured,
-    image: body.image || "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80",
+    image: body.image || (Array.isArray(body.images) && body.images[0]) || "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80",
+    images: Array.isArray(body.images) ? body.images : undefined,
     tags: body.tags || [],
     itinerary: body.itinerary || [],
     included: body.included || [],
@@ -243,11 +244,11 @@ router.post("/admin/trips", requireAdmin, (req, res) => {
   db.prepare(`
     INSERT INTO trips (
       id, title, short_description, description, category, duration, duration_label,
-      featured, image, tags_json, itinerary_json, included_json, pricing_json,
+      featured, image, images_json, tags_json, itinerary_json, included_json, pricing_json,
       rating, review_count, active
     ) VALUES (
       @id, @title, @short_description, @description, @category, @duration, @duration_label,
-      @featured, @image, @tags_json, @itinerary_json, @included_json, @pricing_json,
+      @featured, @image, @images_json, @tags_json, @itinerary_json, @included_json, @pricing_json,
       @rating, @review_count, @active
     )
   `).run(r);
@@ -269,6 +270,7 @@ router.put("/admin/trips/:id", requireAdmin, (req, res) => {
     tags: body.tags || prev.tags,
     itinerary: body.itinerary || prev.itinerary,
     included: body.included || prev.included,
+    images: Array.isArray(body.images) ? body.images : prev.images,
   };
 
   const r = tripToRow(trip);
@@ -282,6 +284,7 @@ router.put("/admin/trips/:id", requireAdmin, (req, res) => {
       duration_label = @duration_label,
       featured = @featured,
       image = @image,
+      images_json = @images_json,
       tags_json = @tags_json,
       itinerary_json = @itinerary_json,
       included_json = @included_json,

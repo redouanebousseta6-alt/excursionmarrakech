@@ -222,55 +222,110 @@ async function loadBookings() {
 
 const dialog = $("#trip-dialog");
 const form = $("#trip-form");
-const imagePreview = $("#image-preview");
-const imagePreviewEmpty = $("#image-preview-empty");
+const imageGalleryList = $("#image-gallery-list");
+const imageGalleryEmpty = $("#image-gallery-empty");
 const imageUrlInput = $("#image-url");
 const imageFileInput = $("#image-file");
 const imagePickBtn = $("#image-pick-btn");
 const imageUploadStatus = $("#image-upload-status");
+const imageUrlAddBtn = $("#image-url-add");
 
-function setImagePreview(url) {
-  const src = String(url || "").trim();
-  if (src) {
-    imagePreview.src = src;
-    imagePreview.hidden = false;
-    imagePreviewEmpty.hidden = true;
-  } else {
-    imagePreview.removeAttribute("src");
-    imagePreview.hidden = true;
-    imagePreviewEmpty.hidden = false;
-  }
+let galleryImages = [];
+
+function renderGallery() {
+  if (!imageGalleryList) return;
+  imageGalleryList.innerHTML = galleryImages
+    .map((url, index) => {
+      return `
+        <li class="image-gallery-item${index === 0 ? " is-cover" : ""}" data-index="${index}">
+          <img src="${escapeHtml(url)}" alt="Gallery image ${index + 1}" />
+          ${index === 0 ? '<span class="cover-badge">Cover</span>' : ""}
+          <div class="image-gallery-actions">
+            <button type="button" data-gallery-up ${index === 0 ? "disabled" : ""}>↑</button>
+            <button type="button" data-gallery-down ${index === galleryImages.length - 1 ? "disabled" : ""}>↓</button>
+            <button type="button" data-gallery-remove>Remove</button>
+          </div>
+        </li>`;
+    })
+    .join("");
+  if (imageGalleryEmpty) imageGalleryEmpty.hidden = galleryImages.length > 0;
 }
 
-imageUrlInput?.addEventListener("input", () => {
-  setImagePreview(imageUrlInput.value);
-  if (imageUploadStatus) imageUploadStatus.textContent = "";
-});
+function addGalleryUrls(urls) {
+  const next = [...galleryImages];
+  urls.forEach((url) => {
+    const clean = String(url || "").trim();
+    if (!clean || next.includes(clean)) return;
+    next.push(clean);
+  });
+  galleryImages = next;
+  renderGallery();
+}
 
 imagePickBtn?.addEventListener("click", () => imageFileInput?.click());
 
 imageFileInput?.addEventListener("change", async () => {
-  const file = imageFileInput.files && imageFileInput.files[0];
-  if (!file) return;
-  imageUploadStatus.textContent = "Uploading…";
+  const files = imageFileInput.files ? [...imageFileInput.files] : [];
+  if (!files.length) return;
+  imageUploadStatus.textContent = files.length > 1 ? `Uploading ${files.length} images…` : "Uploading…";
   imagePickBtn.disabled = true;
   try {
     const body = new FormData();
-    body.append("image", file);
+    files.forEach((file) => body.append("images", file));
     const headers = {};
     if (token()) headers.Authorization = `Bearer ${token()}`;
     const res = await fetch(API + "/admin/upload", { method: "POST", headers, body });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || res.statusText);
-    imageUrlInput.value = data.url;
-    setImagePreview(data.url);
-    imageUploadStatus.textContent = "Uploaded";
+    addGalleryUrls(data.urls || (data.url ? [data.url] : []));
+    imageUploadStatus.textContent =
+      (data.urls || []).length > 1 ? `Uploaded ${(data.urls || []).length} images` : "Uploaded";
   } catch (err) {
     console.error(err);
     imageUploadStatus.textContent = err.message || "Upload failed";
   } finally {
     imagePickBtn.disabled = false;
     imageFileInput.value = "";
+  }
+});
+
+imageUrlAddBtn?.addEventListener("click", () => {
+  const url = String(imageUrlInput?.value || "").trim();
+  if (!url) return;
+  addGalleryUrls([url]);
+  imageUrlInput.value = "";
+  if (imageUploadStatus) imageUploadStatus.textContent = "URL added";
+});
+
+imageUrlInput?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    imageUrlAddBtn?.click();
+  }
+});
+
+imageGalleryList?.addEventListener("click", (e) => {
+  const item = e.target.closest(".image-gallery-item");
+  if (!item) return;
+  const index = Number(item.dataset.index);
+  if (Number.isNaN(index)) return;
+  if (e.target.closest("[data-gallery-remove]")) {
+    galleryImages.splice(index, 1);
+    renderGallery();
+    return;
+  }
+  if (e.target.closest("[data-gallery-up]") && index > 0) {
+    const tmp = galleryImages[index - 1];
+    galleryImages[index - 1] = galleryImages[index];
+    galleryImages[index] = tmp;
+    renderGallery();
+    return;
+  }
+  if (e.target.closest("[data-gallery-down]") && index < galleryImages.length - 1) {
+    const tmp = galleryImages[index + 1];
+    galleryImages[index + 1] = galleryImages[index];
+    galleryImages[index] = tmp;
+    renderGallery();
   }
 });
 
@@ -286,8 +341,14 @@ $("#trip-cancel").addEventListener("click", () => dialog.close());
 function openTripDialog(trip) {
   form.reset();
   if (imageUploadStatus) imageUploadStatus.textContent = "";
+  if (imageUrlInput) imageUrlInput.value = "";
   $("#trip-dialog-title").textContent = trip ? "Edit excursion" : "New excursion";
   form.id.value = trip?.id || "";
+  galleryImages = trip?.images?.length
+    ? [...trip.images]
+    : trip?.image
+      ? [trip.image]
+      : [];
   if (trip) {
     form.title.value = trip.title;
     form.category.value = trip.category;
@@ -295,7 +356,6 @@ function openTripDialog(trip) {
     form.description.value = trip.description;
     form.duration.value = trip.duration || "";
     form.durationLabel.value = trip.durationLabel || "";
-    form.image.value = trip.image || "";
     form.featured.checked = !!trip.featured;
     form.active.checked = trip.active !== false;
     form.itinerary.value = (trip.itinerary || []).join("\n");
@@ -310,7 +370,7 @@ function openTripDialog(trip) {
     form.active.checked = true;
     form.pricingType.value = "flat";
   }
-  setImagePreview(form.image.value);
+  renderGallery();
   $("#pricing-type").dispatchEvent(new Event("change"));
   dialog.showModal();
 }
@@ -339,7 +399,8 @@ form.addEventListener("submit", async (e) => {
     description: fd.get("description"),
     duration: fd.get("duration"),
     durationLabel: fd.get("durationLabel") || fd.get("duration"),
-    image: fd.get("image") || undefined,
+    image: galleryImages[0] || undefined,
+    images: galleryImages,
     featured: form.featured.checked,
     active: form.active.checked,
     itinerary: String(fd.get("itinerary") || "")
