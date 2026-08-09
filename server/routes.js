@@ -4,6 +4,7 @@ const { db, rowToTrip, tripToRow } = require("./db");
 const { requireAdmin, loginAdmin } = require("./auth");
 const { CATEGORIES, startingPrice, computeTotal } = require("./pricing");
 const { DEFAULT_RATES } = require("../js/currency.js");
+const { uploadTripImage } = require("./upload");
 
 const router = express.Router();
 
@@ -203,6 +204,8 @@ router.post("/admin/login", (req, res) => {
 router.get("/admin/me", requireAdmin, (req, res) => {
   res.json({ email: req.admin.email, id: req.admin.sub });
 });
+
+router.post("/admin/upload", requireAdmin, uploadTripImage);
 
 // ——— Admin trips ———
 router.get("/admin/trips", requireAdmin, (_req, res) => {

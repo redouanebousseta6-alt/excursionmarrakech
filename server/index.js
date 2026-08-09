@@ -30,6 +30,7 @@ const RESERVED_SLUGS = new Set([
   "css",
   "js",
   "data",
+  "uploads",
   "node_modules",
   "server",
   "assets",
@@ -167,6 +168,9 @@ Object.entries(PAGE_FILES).forEach(([slug, file]) => {
   app.get(`/${slug}`, (_req, res) => sendPage(res, file));
 });
 
+app.use("/uploads", express.static(path.join(root, "uploads")));
+app.use("/admin", express.static(path.join(root, "admin")));
+
 // Trip detail: /:slug (domain + trip id)
 app.get("/:slug", (req, res, next) => {
   const slug = req.params.slug;
@@ -176,7 +180,6 @@ app.get("/:slug", (req, res, next) => {
   return sendPage(res, "trip.html");
 });
 
-app.use("/admin", express.static(path.join(root, "admin")));
 app.use(express.static(root, { index: false }));
 
 app.use((req, res) => {

@@ -222,6 +222,57 @@ async function loadBookings() {
 
 const dialog = $("#trip-dialog");
 const form = $("#trip-form");
+const imagePreview = $("#image-preview");
+const imagePreviewEmpty = $("#image-preview-empty");
+const imageUrlInput = $("#image-url");
+const imageFileInput = $("#image-file");
+const imagePickBtn = $("#image-pick-btn");
+const imageUploadStatus = $("#image-upload-status");
+
+function setImagePreview(url) {
+  const src = String(url || "").trim();
+  if (src) {
+    imagePreview.src = src;
+    imagePreview.hidden = false;
+    imagePreviewEmpty.hidden = true;
+  } else {
+    imagePreview.removeAttribute("src");
+    imagePreview.hidden = true;
+    imagePreviewEmpty.hidden = false;
+  }
+}
+
+imageUrlInput?.addEventListener("input", () => {
+  setImagePreview(imageUrlInput.value);
+  if (imageUploadStatus) imageUploadStatus.textContent = "";
+});
+
+imagePickBtn?.addEventListener("click", () => imageFileInput?.click());
+
+imageFileInput?.addEventListener("change", async () => {
+  const file = imageFileInput.files && imageFileInput.files[0];
+  if (!file) return;
+  imageUploadStatus.textContent = "Uploading…";
+  imagePickBtn.disabled = true;
+  try {
+    const body = new FormData();
+    body.append("image", file);
+    const headers = {};
+    if (token()) headers.Authorization = `Bearer ${token()}`;
+    const res = await fetch(API + "/admin/upload", { method: "POST", headers, body });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || res.statusText);
+    imageUrlInput.value = data.url;
+    setImagePreview(data.url);
+    imageUploadStatus.textContent = "Uploaded";
+  } catch (err) {
+    console.error(err);
+    imageUploadStatus.textContent = err.message || "Upload failed";
+  } finally {
+    imagePickBtn.disabled = false;
+    imageFileInput.value = "";
+  }
+});
 
 $("#pricing-type").addEventListener("change", () => {
   const type = $("#pricing-type").value;
@@ -234,6 +285,7 @@ $("#trip-cancel").addEventListener("click", () => dialog.close());
 
 function openTripDialog(trip) {
   form.reset();
+  if (imageUploadStatus) imageUploadStatus.textContent = "";
   $("#trip-dialog-title").textContent = trip ? "Edit excursion" : "New excursion";
   form.id.value = trip?.id || "";
   if (trip) {
@@ -258,6 +310,7 @@ function openTripDialog(trip) {
     form.active.checked = true;
     form.pricingType.value = "flat";
   }
+  setImagePreview(form.image.value);
   $("#pricing-type").dispatchEvent(new Event("change"));
   dialog.showModal();
 }
