@@ -67,7 +67,7 @@ EM.TRIPS = [
     duration: "2 hours",
     durationLabel: "2 hours",
     featured: true,
-    image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&q=80",
+    image: "/images/trips/hammam-spa-massage.jpg",
     tags: ["hammam", "spa", "massage"],
     itinerary: [
       "Welcome & preparation in a traditional hammam setting",
@@ -95,7 +95,7 @@ EM.TRIPS = [
     duration: "1 hour",
     durationLabel: "1 hour",
     featured: false,
-    image: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=1200&q=80",
+    image: "/images/trips/horse-riding-palmeraie.jpg",
     tags: ["horse riding", "palmeraie"],
     itinerary: [
       "Meet your guide at the Palmeraie stables",
@@ -122,7 +122,7 @@ EM.TRIPS = [
     duration: "8 am – 8 pm",
     durationLabel: "Full day",
     featured: true,
-    image: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/trips/agafay-promo-pack.jpg",
     tags: ["agafay", "quad", "camel", "dinner", "show"],
     itinerary: [
       "Morning departure toward the Agafay Desert",
@@ -151,7 +151,7 @@ EM.TRIPS = [
     duration: "3 pm – 10 pm",
     durationLabel: "1 hour ride",
     featured: true,
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+    image: "/images/trips/vip-buggy-canam.jpg",
     tags: ["buggy", "vip", "can-am", "luxury"],
     itinerary: [
       "Afternoon meeting & safety briefing",
@@ -184,7 +184,7 @@ EM.TRIPS = [
     duration: "2 days / 1 night",
     durationLabel: "2 days / 1 night",
     featured: true,
-    image: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1200&q=80",
+    image: "/images/trips/zagora-desert.jpg",
     tags: ["zagora", "desert", "overnight"],
     itinerary: [
       "Day 1: Departure from Marrakech across the Atlas Mountains",
@@ -218,7 +218,7 @@ EM.TRIPS = [
     duration: "Full day",
     durationLabel: "Full day",
     featured: false,
-    image: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/trips/ouarzazate.jpg",
     tags: ["ouarzazate", "ait ben haddou", "unesco"],
     itinerary: [
       "Morning departure via the High Atlas Mountains",
@@ -252,7 +252,7 @@ EM.TRIPS = [
     duration: "3 days / 2 nights",
     durationLabel: "3 days / 2 nights",
     featured: true,
-    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1200&q=80",
+    image: "/images/trips/merzouga.jpg",
     tags: ["merzouga", "sahara", "camel", "overnight"],
     itinerary: [
       "Day 1: Marrakech → High Atlas → southern valleys & overnight stop",
@@ -286,7 +286,7 @@ EM.TRIPS = [
     duration: "08:30 – evening",
     durationLabel: "Full day",
     featured: false,
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+    image: "/images/trips/agadir-day-tour.jpg",
     tags: ["agadir", "atlantic", "beach"],
     itinerary: [
       "08:30 departure from Marrakech",
@@ -320,7 +320,7 @@ EM.TRIPS = [
     duration: "Half day",
     durationLabel: "Tour duration varies",
     featured: false,
-    image: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/trips/electric-scooter.jpg",
     tags: ["scooter", "eco", "medina", "palm grove"],
     itinerary: [
       "Meet your local expert guide",
@@ -353,7 +353,7 @@ EM.TRIPS = [
     duration: "8 am – 6 pm window",
     durationLabel: "Carriage tour",
     featured: false,
-    image: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=1200&q=80",
+    image: "/images/trips/gardens-ramparts-carriage.jpg",
     tags: ["carriage", "majorelle", "menara", "ramparts"],
     itinerary: [
       "Board your horse-drawn carriage",
@@ -380,7 +380,7 @@ EM.TRIPS = [
     duration: "Full day",
     durationLabel: "Full day",
     featured: true,
-    image: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=1200&q=80",
+    image: "/images/trips/road-of-the-kasbahs.jpg",
     tags: ["kasbahs", "telouet", "ait ben haddou"],
     itinerary: [
       "Ascend via Tizi n'Tichka mountain pass",
@@ -413,7 +413,7 @@ EM.TRIPS = [
     duration: "5 pm – 10 pm",
     durationLabel: "5 hours",
     featured: false,
-    image: "https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?w=1200&q=80",
+    image: "/images/trips/evening-marrakech-desert.jpg",
     tags: ["agafay", "sunset", "camel", "evening"],
     itinerary: [
       "Afternoon departure to Agafay",
@@ -440,7 +440,7 @@ EM.TRIPS = [
     duration: "6 pm – 8 pm",
     durationLabel: "2 hours",
     featured: false,
-    image: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/trips/marrakech-by-carriage-night.jpg",
     tags: ["night", "carriage", "jemaa el fna"],
     itinerary: [
       "Evening boarding of horse-drawn carriage",
@@ -465,7 +465,7 @@ EM.TRIPS = [
     duration: "7 pm – 10 pm",
     durationLabel: "3 hours",
     featured: false,
-    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80",
+    image: "/images/trips/lights-barbecue-dinner.jpg",
     tags: ["carriage", "dinner", "riad", "barbecue"],
     itinerary: [
       "Sunset carriage through fountains & historic ramparts",
@@ -491,7 +491,7 @@ EM.TRIPS = [
     duration: "9 am – 5 pm",
     durationLabel: "Full day",
     featured: false,
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+    image: "/images/trips/berber-trails.jpg",
     tags: ["hiking", "atlas", "berber"],
     itinerary: [
       "09:00 departure toward the High Atlas",
@@ -527,7 +527,7 @@ EM.TRIPS = [
     duration: "9 am – 1 pm",
     durationLabel: "Half day",
     featured: false,
-    image: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80",
+    image: "/images/trips/medina-tour.jpg",
     tags: ["medina", "souks", "monuments"],
     itinerary: [
       "Morning start in the historic Medina",
@@ -561,7 +561,7 @@ EM.TRIPS = [
     duration: "9 am – 3 pm",
     durationLabel: "Half day+",
     featured: true,
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+    image: "/images/trips/ourika-valley.jpg",
     tags: ["ourika", "waterfalls", "setti fatma"],
     itinerary: [
       "09:00 departure to Ourika Valley",
@@ -595,7 +595,7 @@ EM.TRIPS = [
     duration: "8 am – 6 pm",
     durationLabel: "Full day",
     featured: true,
-    image: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=1200&q=80",
+    image: "/images/trips/ouzoud-waterfalls.jpg",
     tags: ["ouzoud", "waterfalls", "nature"],
     itinerary: [
       "08:00 departure from Marrakech",
@@ -629,7 +629,7 @@ EM.TRIPS = [
     duration: "8 am – 7 pm",
     durationLabel: "Full day",
     featured: true,
-    image: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=1200&q=80",
+    image: "/images/trips/essaouira.jpg",
     tags: ["essaouira", "atlantic", "medina"],
     itinerary: [
       "08:00 departure (186 km from Marrakech)",
@@ -663,7 +663,7 @@ EM.TRIPS = [
     duration: "Morning or afternoon",
     durationLabel: "Half day",
     featured: false,
-    image: "https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/trips/quad-agafay.jpg",
     tags: ["quad", "agafay", "berber"],
     itinerary: [
       "Choose morning (9–13h) or afternoon (14–18h) session",
@@ -695,7 +695,7 @@ EM.TRIPS = [
     duration: "9 am – 2 pm",
     durationLabel: "5 hours",
     featured: false,
-    image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200&q=80",
+    image: "/images/trips/cooking-class.jpg",
     tags: ["cooking", "gastronomy", "chef"],
     itinerary: [
       "09:00 welcome & market/ingredient introduction",
@@ -722,7 +722,7 @@ EM.TRIPS = [
     duration: "Morning or afternoon",
     durationLabel: "Half day",
     featured: false,
-    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1200&q=80",
+    image: "/images/trips/dromedary-agafay.jpg",
     tags: ["camel", "dromedary", "agafay"],
     itinerary: [
       "Choose morning or afternoon slot",
@@ -749,7 +749,7 @@ EM.TRIPS = [
     duration: "5 am – 10 am (1h flight)",
     durationLabel: "1 hour flight",
     featured: true,
-    image: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=1200&q=80",
+    image: "/images/trips/hot-air-balloon.jpg",
     tags: ["balloon", "sunrise", "atlas"],
     itinerary: [
       "Very early morning pickup (from 5 am)",
@@ -778,7 +778,7 @@ EM.TRIPS = [
     duration: "9 am – 5 pm",
     durationLabel: "Full day",
     featured: false,
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+    image: "/images/trips/imlil-asni.jpg",
     tags: ["imlil", "toubkal", "hiking"],
     itinerary: [
       "09:00 departure (64 km to Imlil)",
@@ -812,7 +812,7 @@ EM.TRIPS = [
     duration: "7 pm – 11 pm",
     durationLabel: "4 hours",
     featured: false,
-    image: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=1200&q=80",
+    image: "/images/trips/fantasia-chez-ali.jpg",
     tags: ["fantasia", "dinner", "show"],
     itinerary: [
       "19:00 transfer to Chez Ali",
@@ -846,7 +846,7 @@ EM.TRIPS = [
     duration: "Morning or afternoon",
     durationLabel: "Half day",
     featured: true,
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+    image: "/images/trips/buggy-agafay.jpg",
     tags: ["buggy", "agafay", "adventure"],
     itinerary: [
       "Morning or afternoon session",
@@ -1010,6 +1010,37 @@ EM.getByCategory = function (categoryId) {
   return EM.TRIPS.filter(function (t) {
     return t.category === categoryId;
   });
+};
+
+/** Related trips for a listing page: same category first, then featured/top-rated. */
+EM.getRelatedTrips = function (trip, limit) {
+  limit = limit || 4;
+  if (!trip) return [];
+  var trips = EM.TRIPS || [];
+  var others = trips.filter(function (t) {
+    return t && t.id && t.id !== trip.id;
+  });
+
+  function byRating(a, b) {
+    var ra = EM.ensureRating ? EM.ensureRating(a) : { rating: 0, reviewCount: 0 };
+    var rb = EM.ensureRating ? EM.ensureRating(b) : { rating: 0, reviewCount: 0 };
+    return rb.rating - ra.rating || rb.reviewCount - ra.reviewCount;
+  }
+
+  var same = others
+    .filter(function (t) {
+      return t.category === trip.category;
+    })
+    .sort(byRating);
+  var rest = others
+    .filter(function (t) {
+      return t.category !== trip.category;
+    })
+    .sort(function (a, b) {
+      return (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || byRating(a, b);
+    });
+
+  return same.concat(rest).slice(0, limit);
 };
 
 EM.categoryName = function (id) {

@@ -139,6 +139,41 @@
           </div>
         </aside>
       </div>
+
+      <section class="related-trips" id="related-trips" hidden aria-labelledby="related-trips-heading">
+        <div class="container">
+          <div class="related-trips__head">
+            <h2 id="related-trips-heading">You might also like</h2>
+            <a class="related-trips__all" href="/trips">View all trips →</a>
+          </div>
+          <div class="related-trips__wrap">
+            <button
+              type="button"
+              class="related-trips__nav related-trips__nav--prev"
+              id="related-trips-prev"
+              aria-label="Previous recommendations"
+              hidden
+            >
+              ‹
+            </button>
+            <div
+              class="related-trips__rail"
+              id="related-trips-rail"
+              tabindex="0"
+              aria-label="Recommended excursions"
+            ></div>
+            <button
+              type="button"
+              class="related-trips__nav related-trips__nav--next"
+              id="related-trips-next"
+              aria-label="Next recommendations"
+              hidden
+            >
+              ›
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
 
     <footer class="site-footer">

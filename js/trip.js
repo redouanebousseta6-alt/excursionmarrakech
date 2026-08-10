@@ -129,6 +129,25 @@ document.addEventListener("DOMContentLoaded", async function () {
     })
     .join("");
 
+  // Related trips ("You might also like")
+  try {
+    await EM.loadTrips();
+  } catch (e) {
+    /* static catalogue already available */
+  }
+  var relatedSection = document.getElementById("related-trips");
+  var relatedRail = document.getElementById("related-trips-rail");
+  if (relatedSection && relatedRail && EM.getRelatedTrips) {
+    var related = EM.getRelatedTrips(trip, 4);
+    if (related.length) {
+      relatedSection.hidden = false;
+      relatedSection.dataset.tripId = trip.id;
+      relatedSection.querySelector(".related-trips__all").href = EM.tripsUrl(trip.category);
+      EM.renderTripGrid(relatedRail, related);
+      if (EM.syncRelatedTripsNav) EM.syncRelatedTripsNav();
+    }
+  }
+
   var selection = {};
   var pricingMount = document.getElementById("pricing-controls");
   var amountEl = document.getElementById("display-amount");

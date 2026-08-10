@@ -102,6 +102,35 @@
     container.innerHTML = trips.map(EM.tripCardHtml).join("");
   };
 
+  EM.syncRelatedTripsNav = function () {
+    var rail = document.getElementById("related-trips-rail");
+    var prev = document.getElementById("related-trips-prev");
+    var next = document.getElementById("related-trips-next");
+    if (!rail || !prev || !next) return;
+
+    function update() {
+      var max = Math.max(0, rail.scrollWidth - rail.clientWidth - 4);
+      var atStart = rail.scrollLeft <= 4;
+      var atEnd = rail.scrollLeft >= max;
+      var canScroll = max > 8;
+      prev.hidden = !canScroll || atStart;
+      next.hidden = !canScroll || atEnd;
+    }
+
+    if (!rail.dataset.navBound) {
+      rail.dataset.navBound = "1";
+      prev.addEventListener("click", function () {
+        rail.scrollBy({ left: -Math.max(260, rail.clientWidth * 0.85), behavior: "smooth" });
+      });
+      next.addEventListener("click", function () {
+        rail.scrollBy({ left: Math.max(260, rail.clientWidth * 0.85), behavior: "smooth" });
+      });
+      rail.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("resize", update);
+    }
+    requestAnimationFrame(update);
+  };
+
   EM.initNav = function () {
     var toggle = document.querySelector("[data-nav-toggle]");
     var nav = document.querySelector("[data-nav]");
@@ -154,6 +183,19 @@
         var params = new URLSearchParams(window.location.search);
         var active = params.get("category") || "all";
         EM.renderTripGrid(tripsGrid, EM.getByCategory(active === "all" ? null : active));
+      }
+      var relatedRail = document.getElementById("related-trips-rail");
+      var relatedSection = document.getElementById("related-trips");
+      if (relatedRail && relatedSection && relatedSection.dataset.tripId && EM.getRelatedTrips) {
+        var current = EM.getTrip
+          ? EM.getTrip(relatedSection.dataset.tripId)
+          : (EM.TRIPS || []).find(function (t) {
+              return t.id === relatedSection.dataset.tripId;
+            });
+        if (current) {
+          EM.renderTripGrid(relatedRail, EM.getRelatedTrips(current, 4));
+          if (typeof EM.syncRelatedTripsNav === "function") EM.syncRelatedTripsNav();
+        }
       }
     });
   };

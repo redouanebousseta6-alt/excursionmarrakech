@@ -79,10 +79,38 @@ function seedIfEmpty() {
   if (Number(count) === 0) {
     console.log("Empty database — seeding defaults...");
     seed();
+    return;
   }
+  // Keep cover paths in sync with catalogue (local files under /images/trips).
+  syncTripCovers();
 }
 
-module.exports = { seed, seedIfEmpty };
+/** Update trip cover images from data.js without wiping other admin edits. */
+function syncTripCovers() {
+  const upd = db.prepare(
+    "UPDATE trips SET image = @image, images_json = @images_json, updated_at = datetime('now') WHERE id = @id"
+  );
+  let n = 0;
+  db.exec("BEGIN");
+  try {
+    for (const trip of EM.TRIPS) {
+      const row = tripToRow(trip);
+      const info = upd.run({
+        id: row.id,
+        image: row.image,
+        images_json: row.images_json,
+      });
+      n += info.changes;
+    }
+    db.exec("COMMIT");
+  } catch (err) {
+    db.exec("ROLLBACK");
+    throw err;
+  }
+  if (n) console.log(`Synced cover images for ${n} trips`);
+}
+
+module.exports = { seed, seedIfEmpty, syncTripCovers };
 
 if (require.main === module) {
   seed();

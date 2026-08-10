@@ -95,6 +95,34 @@
         });
       };
     }
+    if (!EM.getRelatedTrips) {
+      EM.getRelatedTrips = function (trip, limit) {
+        limit = limit || 4;
+        if (!trip) return [];
+        var trips = EM.TRIPS || [];
+        var others = trips.filter(function (t) {
+          return t && t.id && t.id !== trip.id;
+        });
+        function byRating(a, b) {
+          var ra = EM.ensureRating ? EM.ensureRating(a) : { rating: 0, reviewCount: 0 };
+          var rb = EM.ensureRating ? EM.ensureRating(b) : { rating: 0, reviewCount: 0 };
+          return rb.rating - ra.rating || rb.reviewCount - ra.reviewCount;
+        }
+        var same = others
+          .filter(function (t) {
+            return t.category === trip.category;
+          })
+          .sort(byRating);
+        var rest = others
+          .filter(function (t) {
+            return t.category !== trip.category;
+          })
+          .sort(function (a, b) {
+            return (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || byRating(a, b);
+          });
+        return same.concat(rest).slice(0, limit);
+      };
+    }
     if (!EM.CATEGORIES) {
       EM.CATEGORIES = [
         { id: "desert", name: "Desert Adventures", description: "", image: "" },
