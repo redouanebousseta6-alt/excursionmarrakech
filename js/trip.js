@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     noteEl.textContent = resolved.note || "";
     noteEl.style.display = resolved.note ? "block" : "none";
     if (totalEl) {
-      totalEl.textContent = "Total: " + EM.formatPrice(total) + " · " + travelers + " traveler(s)";
+      totalEl.textContent = "Price: " + EM.formatPrice(total) + " · " + travelers + " traveler(s)";
     }
     if (modeInput) {
       modeInput.value = JSON.stringify({
