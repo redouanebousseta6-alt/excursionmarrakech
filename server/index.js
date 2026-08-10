@@ -31,6 +31,7 @@ const RESERVED_SLUGS = new Set([
   "js",
   "data",
   "uploads",
+  "images",
   "node_modules",
   "server",
   "assets",
