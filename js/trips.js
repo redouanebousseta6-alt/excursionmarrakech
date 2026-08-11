@@ -1,10 +1,11 @@
 /**
- * Archive — API trips + category filters
+ * Archive — API trips + category filters (+ airport transfer card)
  */
 document.addEventListener("DOMContentLoaded", async function () {
   EM.setActiveNav("trips");
   EM.ensureHelpers();
   await EM.loadConfig();
+  if (EM.initI18n) EM.initI18n();
   EM.initTracking(EM.config);
   await EM.loadTrips();
 
@@ -16,12 +17,35 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   function applyFilter(categoryId) {
     active = categoryId || "all";
-    var trips = EM.getByCategory(active === "all" ? null : active);
-    EM.renderTripGrid(grid, trips);
-    if (countEl) {
-      var label = active === "all" ? "All trips" : EM.categoryName(active);
-      countEl.textContent =
-        trips.length + " " + (trips.length === 1 ? "trip" : "trips") + " · " + label;
+    var trips = EM.getByCategory(active === "all" || active === "transfers" ? null : active);
+    if (active === "transfers") {
+      EM.renderTripGrid(grid, [], { transferOnly: true });
+      if (countEl) {
+        countEl.textContent =
+          "1 " + (EM.t ? EM.t("trips.listing") : "listing") + " · " + (EM.t ? EM.t("trips.transfersFilter") : "Airport transfers");
+      }
+    } else {
+      EM.renderTripGrid(grid, trips, { includeTransfer: active === "all" });
+      if (countEl) {
+        var total = trips.length + (active === "all" ? 1 : 0);
+        var label =
+          active === "all"
+            ? EM.t
+              ? EM.t("trips.all")
+              : "All trips"
+            : EM.categoryLabel
+              ? EM.categoryLabel(active)
+              : EM.categoryName(active);
+        var word =
+          total === 1
+            ? EM.t
+              ? EM.t("trips.listing")
+              : "listing"
+            : EM.t
+              ? EM.t("trips.listings")
+              : "listings";
+        countEl.textContent = total + " " + word + " · " + label;
+      }
     }
     document.querySelectorAll(".filter-btn").forEach(function (btn) {
       btn.setAttribute(
@@ -35,21 +59,30 @@ document.addEventListener("DOMContentLoaded", async function () {
     window.history.replaceState({}, "", url);
   }
 
-  if (filterList) {
+  EM.refreshTripsFilters = function () {
+    if (!filterList) return;
     filterList.innerHTML =
-      '<li><button type="button" class="filter-btn" data-category="all" aria-pressed="true">All trips</button></li>' +
+      '<li><button type="button" class="filter-btn" data-category="all">' +
+      EM.escapeHtml(EM.t ? EM.t("trips.all") : "All trips") +
+      "</button></li>" +
+      '<li><button type="button" class="filter-btn" data-category="transfers">' +
+      EM.escapeHtml(EM.t ? EM.t("trips.transfersFilter") : "Airport transfers") +
+      "</button></li>" +
       (EM.CATEGORIES || [])
         .map(function (c) {
           return (
             '<li><button type="button" class="filter-btn" data-category="' +
             EM.escapeHtml(c.id) +
             '">' +
-            EM.escapeHtml(c.name) +
+            EM.escapeHtml(EM.categoryLabel ? EM.categoryLabel(c.id) : c.name) +
             "</button></li>"
           );
         })
         .join("");
+    applyFilter(active);
+  };
 
+  if (filterList) {
     filterList.addEventListener("click", function (e) {
       var btn = e.target.closest(".filter-btn");
       if (!btn) return;
@@ -57,5 +90,5 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
-  applyFilter(active);
+  EM.refreshTripsFilters();
 });

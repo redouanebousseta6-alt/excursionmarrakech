@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   EM.setActiveNav("trips");
   EM.ensureHelpers();
   await EM.loadConfig();
+  if (EM.initI18n) EM.initI18n();
   EM.initTracking(EM.config);
 
   var id = EM.tripIdFromLocation();
@@ -23,6 +24,68 @@ document.addEventListener("DOMContentLoaded", async function () {
   document.title = trip.title + " | excursionmarrakech";
   var metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) metaDesc.setAttribute("content", trip.shortDescription);
+
+  EM._currentTrip = trip;
+  EM.applyTripI18n = function (baseTrip) {
+    var loc = EM.localizedTrip ? EM.localizedTrip(baseTrip) : baseTrip;
+    document.getElementById("trip-category").textContent = EM.categoryLabel
+      ? EM.categoryLabel(baseTrip.category)
+      : EM.categoryName(baseTrip.category);
+    document.getElementById("trip-title").textContent = loc.title;
+    document.title = loc.title + " | excursionmarrakech";
+    var descHeading = document.getElementById("desc-heading");
+    var itinHeading = document.getElementById("itin-heading");
+    var inclHeading = document.getElementById("incl-heading");
+    var relatedHeading = document.getElementById("related-trips-heading");
+    var relatedAll = document.querySelector(".related-trips__all");
+    if (descHeading && EM.t) descHeading.textContent = EM.t("trip.desc");
+    if (itinHeading && EM.t) itinHeading.textContent = EM.t("trip.itinerary");
+    if (inclHeading && EM.t) inclHeading.textContent = EM.t("trip.included");
+    if (relatedHeading && EM.t) relatedHeading.textContent = EM.t("trip.related");
+    if (relatedAll && EM.t) relatedAll.textContent = EM.t("trip.relatedAll");
+
+    var durationText = loc.durationLabel || loc.duration || "";
+    var durationEl = document.getElementById("trip-duration");
+    if (durationEl) durationEl.textContent = durationText;
+    var startPriceEl = document.getElementById("trip-start-price");
+    if (startPriceEl) startPriceEl.textContent = EM.priceLabel(loc);
+
+    var descEl = document.getElementById("trip-description");
+    if (descEl) descEl.textContent = loc.description || "";
+    var itinEl = document.getElementById("trip-itinerary");
+    if (itinEl && Array.isArray(loc.itinerary)) {
+      itinEl.innerHTML = loc.itinerary
+        .map(function (step) {
+          return "<li>" + EM.escapeHtml(step) + "</li>";
+        })
+        .join("");
+    }
+    var inclEl = document.getElementById("trip-included");
+    if (inclEl && Array.isArray(loc.included)) {
+      inclEl.innerHTML = loc.included
+        .map(function (item) {
+          return "<li>" + EM.escapeHtml(item) + "</li>";
+        })
+        .join("");
+    }
+
+    var rating = EM.ensureRating(baseTrip);
+    var ratingEl = document.getElementById("trip-rating");
+    if (ratingEl) {
+      var reviewsWord = EM.t ? EM.t("trip.reviews") : "reviews";
+      ratingEl.innerHTML =
+        EM.starsHtml(rating.rating) +
+        '<span class="trip-hero__reviews">' +
+        rating.reviewCount +
+        " " +
+        reviewsWord +
+        "</span>";
+    }
+
+    if (typeof EM.refreshTripPrice === "function") EM.refreshTripPrice();
+    if (typeof EM._rebuildTripPricing === "function") EM._rebuildTripPricing();
+  };
+  EM.applyTripI18n(trip);
 
   var fallbackImage =
     "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?auto=format&fit=crop&w=1200&q=80";
@@ -102,32 +165,12 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
   showGalleryImage(0);
 
-  document.getElementById("trip-category").textContent = EM.categoryName(trip.category);
-  document.getElementById("trip-title").textContent = trip.title;
-  document.getElementById("trip-duration").textContent = trip.duration;
-  document.getElementById("trip-start-price").textContent = EM.priceLabel(trip);
-
-  var rating = EM.ensureRating(trip);
-  var ratingEl = document.getElementById("trip-rating");
-  if (ratingEl) {
-    ratingEl.innerHTML =
-      EM.starsHtml(rating.rating) +
-      '<span class="trip-hero__reviews">' +
-      rating.reviewCount +
-      " reviews</span>";
-  }
-
-  document.getElementById("trip-description").textContent = trip.description;
-  document.getElementById("trip-itinerary").innerHTML = trip.itinerary
-    .map(function (step) {
-      return "<li>" + EM.escapeHtml(step) + "</li>";
-    })
-    .join("");
-  document.getElementById("trip-included").innerHTML = trip.included
-    .map(function (item) {
-      return "<li>" + EM.escapeHtml(item) + "</li>";
-    })
-    .join("");
+  EM.trackEvent("view_item", {
+    content_name: trip.title,
+    item_id: trip.id,
+    currency: "MAD",
+    value: EM.startingPrice(trip),
+  });
 
   // Related trips ("You might also like")
   try {
@@ -162,6 +205,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     return Math.max(1, Number(el && el.value) || 1);
   }
 
+  function localizeUnit(unit) {
+    if (!unit) return "";
+    var u = String(unit).toLowerCase();
+    if (u.indexOf("per person") !== -1 && EM.t) return EM.t("booking.perPerson");
+    return unit;
+  }
+
   function updatePriceDisplay() {
     var resolved = EM.resolveUnitPrice(trip, selection);
     var travelers = currentTravelers();
@@ -170,11 +220,14 @@ document.addEventListener("DOMContentLoaded", async function () {
       unit.indexOf("buggy") !== -1 ? resolved.amount : resolved.amount * travelers;
 
     amountEl.textContent = EM.formatPrice(resolved.amount);
-    unitEl.textContent = resolved.unit || "";
+    unitEl.textContent = localizeUnit(resolved.unit || "");
     noteEl.textContent = resolved.note || "";
     noteEl.style.display = resolved.note ? "block" : "none";
     if (totalEl) {
-      totalEl.textContent = "Price: " + EM.formatPrice(total) + " · " + travelers + " traveler(s)";
+      var tpl = EM.t ? EM.t("booking.total") : "Price: {price} · {n} traveler(s)";
+      totalEl.textContent = tpl
+        .replace("{price}", EM.formatPrice(total))
+        .replace("{n}", String(travelers));
     }
     if (modeInput) {
       modeInput.value = JSON.stringify({
@@ -187,6 +240,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   function buildPricingControls() {
+    var prev = selection;
     if (p.type === "flat") {
       pricingMount.innerHTML = "";
       selection = {};
@@ -196,22 +250,30 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (p.type === "private-group") {
       var hasPrivate = p.privatePrice != null;
       var hasGroup = p.groupPrice != null;
-      selection.mode = hasGroup ? "group" : "private";
+      selection.mode = (prev && prev.mode) || (hasGroup ? "group" : "private");
+      var groupLabel = EM.t ? EM.t("booking.group") : "Group";
+      var privateLabel = EM.t ? EM.t("booking.private") : "Private";
+      var minLabel = EM.t ? EM.t("booking.min") : "min";
       var html = '<div class="pricing-toggle" role="radiogroup" aria-label="Booking type">';
       if (hasGroup) {
         html +=
-          '<div class="pricing-option"><input type="radio" name="bookType" id="type-group" value="group" checked>' +
-          '<label for="type-group">Group<span class="opt-price">' +
+          '<div class="pricing-option"><input type="radio" name="bookType" id="type-group" value="group"' +
+          (selection.mode === "group" ? " checked" : "") +
+          '><label for="type-group">' +
+          groupLabel +
+          '<span class="opt-price">' +
           EM.formatPrice(p.groupPrice) +
           "</span></label></div>";
       }
       if (hasPrivate) {
         html +=
           '<div class="pricing-option"><input type="radio" name="bookType" id="type-private" value="private"' +
-          (hasGroup ? "" : " checked") +
-          '><label for="type-private">Private<span class="opt-price">' +
+          (selection.mode === "private" ? " checked" : "") +
+          '><label for="type-private">' +
+          privateLabel +
+          '<span class="opt-price">' +
           EM.formatPrice(p.privatePrice) +
-          (p.minPrivate ? " · min " + p.minPrivate : "") +
+          (p.minPrivate ? " · " + minLabel + " " + p.minPrivate : "") +
           "</span></label></div>";
       }
       html += "</div>";
@@ -226,15 +288,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     if (p.type === "options") {
-      selection.optionId = p.options[0].id;
+      selection.optionId = (prev && prev.optionId) || p.options[0].id;
       var html =
         '<div class="form-group"><label for="opt-select">Choose option</label><select id="opt-select" name="option">';
-      p.options.forEach(function (o, i) {
+      p.options.forEach(function (o) {
         html +=
           '<option value="' +
           EM.escapeHtml(o.id) +
           '"' +
-          (i === 0 ? " selected" : "") +
+          (o.id === selection.optionId ? " selected" : "") +
           ">" +
           EM.escapeHtml(o.label) +
           " — " +
@@ -251,15 +313,23 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     if (p.type === "driver-passenger") {
-      selection.role = "driver";
+      selection.role = (prev && prev.role) || "driver";
+      var driverLabel = EM.t ? EM.t("booking.driver") : "Driver";
+      var passengerLabel = EM.t ? EM.t("booking.passenger") : "Passenger";
       pricingMount.innerHTML =
         '<div class="pricing-toggle" role="radiogroup" aria-label="Rider role">' +
-        '<div class="pricing-option"><input type="radio" name="role" id="role-driver" value="driver" checked>' +
-        '<label for="role-driver">Driver<span class="opt-price">' +
+        '<div class="pricing-option"><input type="radio" name="role" id="role-driver" value="driver"' +
+        (selection.role === "driver" ? " checked" : "") +
+        '><label for="role-driver">' +
+        driverLabel +
+        '<span class="opt-price">' +
         EM.formatPrice(p.driverPrice) +
         "</span></label></div>" +
-        '<div class="pricing-option"><input type="radio" name="role" id="role-passenger" value="passenger">' +
-        '<label for="role-passenger">Passenger<span class="opt-price">' +
+        '<div class="pricing-option"><input type="radio" name="role" id="role-passenger" value="passenger"' +
+        (selection.role === "passenger" ? " checked" : "") +
+        '><label for="role-passenger">' +
+        passengerLabel +
+        '<span class="opt-price">' +
         EM.formatPrice(p.passengerPrice) +
         "</span></label></div></div>";
       pricingMount.querySelectorAll('input[name="role"]').forEach(function (input) {
@@ -273,6 +343,16 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   buildPricingControls();
   updatePriceDisplay();
+  EM._rebuildTripPricing = function () {
+    buildPricingControls();
+    updatePriceDisplay();
+  };
+  EM.refreshTripPrice = function () {
+    var el = document.getElementById("trip-start-price");
+    var loc = EM.localizedTrip ? EM.localizedTrip(trip) : trip;
+    if (el) el.textContent = EM.priceLabel(loc);
+    updatePriceDisplay();
+  };
 
   // Phone country field
   var phoneMount = document.getElementById("phone-field-mount");

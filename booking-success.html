@@ -56,6 +56,7 @@
 
     <script src="js/currency.js"></script>
     <script src="js/api.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/app.js"></script>
     <script src="js/tracking.js"></script>
     <script>
@@ -66,6 +67,9 @@
         const token = params.get("token"); // PayPal may return token=ORDER_ID
 
         await EM.loadConfig();
+        if (EM.initI18n) EM.initI18n();
+        // Conversion pages: grant analytics for this thank-you hit if user already consented,
+        // otherwise still init banner / tags per policy.
         EM.initTracking(EM.config);
 
         if (provider === "paypal" && (token || params.get("orderId"))) {

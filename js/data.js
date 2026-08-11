@@ -1080,15 +1080,17 @@ EM.startingPrice = function (trip) {
 
 EM.priceLabel = function (trip) {
   var p = trip.pricing;
-  if (p.type === "flat") return "from " + EM.formatPrice(p.price);
-  if (p.type === "private-group") {
-    var start = EM.startingPrice(trip);
-    return "from " + EM.formatPrice(start);
+  var amount = null;
+  if (p.type === "flat") amount = p.price;
+  else if (p.type === "private-group" || p.type === "options") amount = EM.startingPrice(trip);
+  else if (p.type === "driver-passenger") amount = p.passengerPrice;
+  if (amount == null) return "";
+  var price = EM.formatPrice(amount);
+  if (EM.t) {
+    var tpl = EM.t("trip.from");
+    if (tpl && tpl.indexOf("trip.from") !== 0) return tpl.replace("{price}", price);
   }
-  if (p.type === "options") return "from " + EM.formatPrice(EM.startingPrice(trip));
-  if (p.type === "driver-passenger")
-    return "from " + EM.formatPrice(p.passengerPrice);
-  return "";
+  return "from " + price;
 };
 
 if (typeof module !== "undefined" && module.exports) {

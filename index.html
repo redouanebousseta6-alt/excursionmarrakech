@@ -32,11 +32,11 @@
           <span></span><span></span><span></span>
         </button>
         <nav id="site-nav" class="nav" data-nav aria-label="Primary">
-          <a href="/" data-page="home">Home</a>
-          <a href="/trips" data-page="trips">All Trips</a>
-          <a href="/about" data-page="about">About</a>
-          <a href="/trips?category=desert">Desert</a>
-          <a class="btn btn--primary" href="/trips">Book an excursion</a>
+          <a href="/" data-page="home" data-i18n="nav.home">Home</a>
+          <a href="/trips" data-page="trips" data-i18n="nav.trips">All Trips</a>
+          <a href="/about" data-page="about" data-i18n="nav.about">About</a>
+          <a href="/airport-transfer" data-page="airport-transfer" data-i18n="nav.transfers">Transfers</a>
+          <a class="btn btn--primary" href="/trips" data-i18n="nav.book">Book an excursion</a>
         </nav>
       </div>
     </header>
@@ -54,15 +54,15 @@
         </div>
         <div class="hero__overlay" aria-hidden="true"></div>
         <div class="container hero__content">
-          <span class="eyebrow" style="color: var(--sand)">Marrakech · Atlas · Sahara</span>
-          <h1>Unforgettable Marrakech excursions, crafted for curious travelers</h1>
-          <p>
+          <span class="eyebrow" style="color: var(--sand)" data-i18n="home.eyebrow">Marrakech · Atlas · Sahara</span>
+          <h1 data-i18n="home.heroTitle">Unforgettable Marrakech excursions, crafted for curious travelers</h1>
+          <p data-i18n="home.heroText">
             From Agafay sunsets to Atlas valleys and medina nights — private or group
             tours with transparent pricing and local guides.
           </p>
           <div class="hero__actions">
-            <a class="btn btn--primary" href="/trips">Explore all trips</a>
-            <a class="btn btn--secondary" href="#featured" style="border-color: #fff; color: #fff"
+            <a class="btn btn--primary" href="/trips" data-i18n="home.ctaExplore">Explore all trips</a>
+            <a class="btn btn--secondary" href="#featured" style="border-color: #fff; color: #fff" data-i18n="home.ctaFeatured"
               >Featured experiences</a
             >
           </div>
@@ -73,14 +73,14 @@
         <div class="container">
           <div class="section__head">
             <div>
-              <span class="eyebrow">Handpicked</span>
-              <h2 id="featured-heading">Featured trips</h2>
+              <span class="eyebrow" data-i18n="home.featuredEyebrow">Handpicked</span>
+              <h2 id="featured-heading" data-i18n="home.featuredTitle">Featured trips</h2>
             </div>
-            <p>Our most requested desert adventures, day trips and signature evenings.</p>
+            <p data-i18n="home.featuredText">Our most requested desert adventures, day trips and signature evenings.</p>
           </div>
           <div class="trip-grid" id="featured-grid"></div>
           <p style="margin-top: 2rem; text-align: center">
-            <a class="btn btn--secondary" href="/trips">View full catalogue</a>
+            <a class="btn btn--secondary" href="/trips" data-i18n="home.viewCatalogue">View full catalogue</a>
           </p>
         </div>
       </section>
@@ -89,10 +89,10 @@
         <div class="container">
           <div class="section__head">
             <div>
-              <span class="eyebrow">Browse by mood</span>
-              <h2 id="categories-heading">Find your kind of Morocco</h2>
+              <span class="eyebrow" data-i18n="home.catsEyebrow">Browse by mood</span>
+              <h2 id="categories-heading" data-i18n="home.catsTitle">Find your kind of Morocco</h2>
             </div>
-            <p>Desert thrills, valley day trips, Red City walks, or slow wellness rituals.</p>
+            <p data-i18n="home.catsText">Desert thrills, valley day trips, Red City walks, or slow wellness rituals.</p>
           </div>
           <div class="cat-grid" id="category-grid"></div>
         </div>
@@ -102,8 +102,8 @@
         <div class="container">
           <div class="section__head">
             <div>
-              <span class="eyebrow">Guest stories</span>
-              <h2 id="reviews-heading">What travelers say</h2>
+              <span class="eyebrow" data-i18n="home.reviewsEyebrow">Guest stories</span>
+              <h2 id="reviews-heading" data-i18n="home.reviewsTitle">What travelers say</h2>
             </div>
             <p id="reviews-summary">Real feedback from recent Marrakech excursions — ratings shown on every trip.</p>
           </div>
@@ -114,42 +114,42 @@
       <section class="section section--ink" aria-labelledby="trust-heading">
         <div class="container trust-grid">
           <div>
-            <span class="eyebrow" style="color: var(--sand)">Why book with us</span>
-            <h2 id="trust-heading" style="color: #fff; margin: 0.4rem 0 1.5rem">
+            <span class="eyebrow" style="color: var(--sand)" data-i18n="home.trustEyebrow">Why book with us</span>
+            <h2 id="trust-heading" style="color: #fff; margin: 0.4rem 0 1.5rem" data-i18n="home.trustTitle">
               Trusted local hosts for Marrakech adventures
             </h2>
             <div class="trust-stats">
               <div class="trust-stat">
                 <strong>26+</strong>
-                <span>Curated trips</span>
+                <span data-i18n="home.statTrips">Curated trips</span>
               </div>
               <div class="trust-stat">
                 <strong>4.9</strong>
-                <span>Guest rating</span>
+                <span data-i18n="home.statRating">Guest rating</span>
               </div>
               <div class="trust-stat">
                 <strong>24/7</strong>
-                <span>WhatsApp support</span>
+                <span data-i18n="home.statSupport">WhatsApp support</span>
               </div>
             </div>
           </div>
           <ul class="trust-points">
             <li>
               <div>
-                <strong>Clear Private vs Group pricing</strong>
-                <span>See exact MAD rates before you inquire — no surprise markups.</span>
+                <strong data-i18n="home.trust1Title">Clear Private vs Group pricing</strong>
+                <span data-i18n="home.trust1Text">See exact MAD rates before you inquire — no surprise markups.</span>
               </div>
             </li>
             <li>
               <div>
-                <strong>Flexible lead booking</strong>
-                <span>Request a date and party size; we confirm availability personally.</span>
+                <strong data-i18n="home.trust2Title">Flexible lead booking</strong>
+                <span data-i18n="home.trust2Text">Request a date and party size; we confirm availability personally.</span>
               </div>
             </li>
             <li>
               <div>
-                <strong>Local expertise</strong>
-                <span>Atlas routes, Agafay camps and medina secrets from people who live here.</span>
+                <strong data-i18n="home.trust3Title">Local expertise</strong>
+                <span data-i18n="home.trust3Text">Atlas routes, Agafay camps and medina secrets from people who live here.</span>
               </div>
             </li>
           </ul>
@@ -162,19 +162,19 @@
         <div class="footer-grid">
           <div>
             <a class="logo" href="/">excursion<span>marrakech</span></a>
-            <p>Premium excursions and desert tours from Marrakech — desert, Atlas, coast & city.</p>
+            <p data-i18n="footer.tagline">Premium excursions and desert tours from Marrakech — desert, Atlas, coast & city.</p>
           </div>
           <div>
-            <h3>Explore</h3>
+            <h3 data-i18n="footer.explore">Explore</h3>
             <ul>
-              <li><a href="/trips">All trips</a></li>
-              <li><a href="/trips?category=desert">Desert adventures</a></li>
-              <li><a href="/trips?category=day-trips">Day trips</a></li>
-              <li><a href="/trips?category=wellness">Wellness</a></li>
+              <li><a href="/trips" data-i18n="footer.allTrips">All trips</a></li>
+              <li><a href="/airport-transfer" data-i18n="footer.transfers">Airport transfers</a></li>
+              <li><a href="/trips?category=desert" data-i18n="footer.desert">Desert adventures</a></li>
+              <li><a href="/trips?category=day-trips" data-i18n="footer.dayTrips">Day trips</a></li>
             </ul>
           </div>
           <div>
-            <h3>Contact</h3>
+            <h3 data-i18n="footer.contact">Contact</h3>
             <ul>
               <li><a href="tel:+212639996960">+212 639 996 960</a></li>
               <li><a href="tel:+212624603887">+212 624 603 887</a></li>
@@ -198,6 +198,8 @@
     <script src="js/data.js" defer></script>
     <script src="js/currency.js" defer></script>
     <script src="js/api.js" defer></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/i18n-trips.js" defer></script>
     <script src="js/tracking.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/home.js" defer></script>

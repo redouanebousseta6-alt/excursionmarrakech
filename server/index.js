@@ -21,6 +21,7 @@ const PAGE_FILES = {
   "terms-of-use": "terms-of-use.html",
   "terms-conditions": "terms-conditions.html",
   "booking-success": "booking-success.html",
+  "airport-transfer": "airport-transfer.html",
 };
 
 const RESERVED_SLUGS = new Set([
@@ -67,11 +68,21 @@ app.use("/api/payments", paymentsRouter);
 app.get("/sitemap.xml", (_req, res) => {
   const site = process.env.SITE_URL || `http://localhost:${PORT}`;
   const trips = db.prepare("SELECT id, updated_at FROM trips WHERE active = 1").all();
-  const staticPages = ["", "/trips", "/about", "/privacy", "/terms-of-use", "/terms-conditions"];
+  const staticPages = [
+    "",
+    "/trips",
+    "/about",
+    "/airport-transfer",
+    "/privacy",
+    "/terms-of-use",
+    "/terms-conditions",
+  ];
   let urls = staticPages
     .map(
       (p) =>
-        `  <url><loc>${site}${p || "/"}</loc><changefreq>weekly</changefreq><priority>${p ? "0.8" : "1.0"}</priority></url>`
+        `  <url><loc>${site}${p || "/"}</loc><changefreq>weekly</changefreq><priority>${
+          p === "" ? "1.0" : p === "/airport-transfer" || p === "/trips" ? "0.9" : "0.8"
+        }</priority></url>`
     )
     .join("\n");
   urls +=

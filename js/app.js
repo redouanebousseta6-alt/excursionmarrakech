@@ -34,11 +34,15 @@
   };
 
   EM.tripCardHtml = function (trip) {
-    var cat = EM.categoryName(trip.category);
+    trip = EM.localizedTrip ? EM.localizedTrip(trip) : trip;
+    var cat = EM.categoryLabel
+      ? EM.categoryLabel(trip.category)
+      : EM.categoryName(trip.category);
     var href = EM.tripUrl(trip.id);
     var fallback =
       "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?auto=format&fit=crop&w=1200&q=80";
     var rating = EM.ensureRating(trip);
+    var viewDetails = EM.t ? EM.t("card.viewDetails") : "View details →";
     return (
       '<article class="trip-card">' +
       '<a class="trip-card__media" href="' +
@@ -60,7 +64,7 @@
       '<div class="trip-card__body">' +
       '<div class="trip-card__meta">' +
       "<span>" +
-      EM.escapeHtml(trip.durationLabel) +
+      EM.escapeHtml(trip.durationLabel || trip.duration || "") +
       "</span>" +
       '<span class="trip-card__rating">' +
       EM.starsHtml(rating.rating, { className: "stars--sm" }) +
@@ -85,21 +89,80 @@
       "</span>" +
       '<a class="trip-card__link" href="' +
       href +
-      '">View details →</a>' +
+      '">' +
+      EM.escapeHtml(viewDetails) +
+      "</a>" +
       "</div>" +
       "</div>" +
       "</article>"
     );
   };
 
-  EM.renderTripGrid = function (container, trips) {
+  EM.airportTransferCardHtml = function () {
+    var href = "/airport-transfer";
+    var img = "/images/transfers/airport-transfer-welcome.jpg";
+    var t = EM.t || function (k) {
+      return k;
+    };
+    return (
+      '<article class="trip-card trip-card--transfer">' +
+      '<a class="trip-card__media" href="' +
+      href +
+      '" aria-label="' +
+      EM.escapeHtml(t("transfer.cardTitle")) +
+      '">' +
+      '<img src="' +
+      img +
+      '" alt="' +
+      EM.escapeHtml(t("transfer.cardTitle")) +
+      '" loading="lazy" width="600" height="450">' +
+      '<span class="trip-card__badge">' +
+      EM.escapeHtml(t("nav.transfers")) +
+      "</span>" +
+      "</a>" +
+      '<div class="trip-card__body">' +
+      '<div class="trip-card__meta"><span>' +
+      EM.escapeHtml(t("transfer.cardMeta")) +
+      "</span></div>" +
+      "<h3><a href=\"" +
+      href +
+      '">' +
+      EM.escapeHtml(t("transfer.cardTitle")) +
+      "</a></h3>" +
+      "<p>" +
+      EM.escapeHtml(t("transfer.cardText")) +
+      "</p>" +
+      '<div class="trip-card__footer">' +
+      '<span class="trip-card__price">' +
+      EM.escapeHtml(t("transfer.cardPrice")) +
+      "</span>" +
+      '<a class="trip-card__link" href="' +
+      href +
+      '">' +
+      EM.escapeHtml(t("transfer.cardLink")) +
+      "</a>" +
+      "</div>" +
+      "</div>" +
+      "</article>"
+    );
+  };
+
+  EM.renderTripGrid = function (container, trips, options) {
     if (!container) return;
-    if (!trips.length) {
+    options = options || {};
+    var html = "";
+    if (options.includeTransfer) html += EM.airportTransferCardHtml();
+    if (!trips.length && !options.includeTransfer) {
       container.innerHTML =
         '<div class="empty-state"><p>No trips match this filter. Try another category.</p></div>';
       return;
     }
-    container.innerHTML = trips.map(EM.tripCardHtml).join("");
+    if (options.transferOnly) {
+      container.innerHTML = EM.airportTransferCardHtml();
+      return;
+    }
+    html += trips.map(EM.tripCardHtml).join("");
+    container.innerHTML = html;
   };
 
   EM.syncRelatedTripsNav = function () {
@@ -134,12 +197,55 @@
   EM.initNav = function () {
     var toggle = document.querySelector("[data-nav-toggle]");
     var nav = document.querySelector("[data-nav]");
-    if (toggle && nav) {
-      toggle.addEventListener("click", function () {
-        var open = nav.classList.toggle("nav--open");
-        toggle.setAttribute("aria-expanded", open ? "true" : "false");
-      });
+    if (!toggle || !nav) {
+      EM.mountCurrencySwitcher();
+      return;
     }
+
+    function setNavOpen(open) {
+      nav.classList.toggle("nav--open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      document.body.classList.toggle("nav-is-open", open);
+      toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    }
+
+    function closeNav() {
+      if (!nav.classList.contains("nav--open")) return;
+      setNavOpen(false);
+    }
+
+    toggle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      setNavOpen(!nav.classList.contains("nav--open"));
+    });
+
+    nav.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", closeNav);
+    });
+
+    document.addEventListener("click", function (e) {
+      if (!nav.classList.contains("nav--open")) return;
+      if (nav.contains(e.target) || toggle.contains(e.target)) return;
+      closeNav();
+    });
+
+    window.addEventListener(
+      "scroll",
+      function () {
+        closeNav();
+      },
+      { passive: true }
+    );
+
+    window.addEventListener("resize", function () {
+      if (window.matchMedia("(min-width: 768px)").matches) closeNav();
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeNav();
+    });
+
+    EM.closeMobileNav = closeNav;
     EM.mountCurrencySwitcher();
   };
 
@@ -177,12 +283,18 @@
       EM.money.setCode(e.target.value);
       // Re-render trip grids if present
       var featured = document.getElementById("featured-grid");
-      if (featured && EM.TRIPS) EM.renderTripGrid(featured, EM.getFeatured(6));
+      if (featured && EM.TRIPS) EM.renderTripGrid(featured, EM.getFeatured(6), { includeTransfer: true });
       var tripsGrid = document.getElementById("trips-grid");
       if (tripsGrid && EM.TRIPS) {
         var params = new URLSearchParams(window.location.search);
         var active = params.get("category") || "all";
-        EM.renderTripGrid(tripsGrid, EM.getByCategory(active === "all" ? null : active));
+        if (active === "transfers") {
+          EM.renderTripGrid(tripsGrid, [], { transferOnly: true });
+        } else {
+          EM.renderTripGrid(tripsGrid, EM.getByCategory(active === "all" ? null : active), {
+            includeTransfer: active === "all",
+          });
+        }
       }
       var relatedRail = document.getElementById("related-trips-rail");
       var relatedSection = document.getElementById("related-trips");
@@ -258,21 +370,5 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     EM.initNav();
-    EM.initCookieBanner();
   });
-
-  EM.initCookieBanner = function () {
-    if (localStorage.getItem("em_cookie_ok")) return;
-    var bar = document.createElement("div");
-    bar.className = "cookie-banner is-visible";
-    bar.setAttribute("role", "dialog");
-    bar.innerHTML =
-      "<p>We use cookies for essential booking features and, if configured, ad measurement (Meta/Google). See our <a href=\"/privacy\" style=\"color:#e8c9a0\">Privacy Policy</a>.</p>" +
-      '<button type="button" class="btn btn--primary" data-cookie-ok>Accept</button>';
-    document.body.appendChild(bar);
-    bar.querySelector("[data-cookie-ok]").addEventListener("click", function () {
-      localStorage.setItem("em_cookie_ok", "1");
-      bar.remove();
-    });
-  };
 })();

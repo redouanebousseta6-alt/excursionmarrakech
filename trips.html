@@ -32,11 +32,11 @@
           <span></span><span></span><span></span>
         </button>
         <nav id="site-nav" class="nav" data-nav aria-label="Primary">
-          <a href="/" data-page="home">Home</a>
-          <a href="/trips" data-page="trips">All Trips</a>
-          <a href="/about" data-page="about">About</a>
-          <a href="/trips?category=desert">Desert</a>
-          <a class="btn btn--primary" href="/trips">Book an excursion</a>
+          <a href="/" data-page="home" data-i18n="nav.home">Home</a>
+          <a href="/trips" data-page="trips" data-i18n="nav.trips">All Trips</a>
+          <a href="/about" data-page="about" data-i18n="nav.about">About</a>
+          <a href="/airport-transfer" data-page="airport-transfer" data-i18n="nav.transfers">Transfers</a>
+          <a class="btn btn--primary" href="/trips" data-i18n="nav.book">Book an excursion</a>
         </nav>
       </div>
     </header>
@@ -44,9 +44,9 @@
     <main>
       <header class="archive-hero">
         <div class="container">
-          <span class="eyebrow">Catalogue</span>
-          <h1>All Marrakech excursions</h1>
-          <p>
+          <span class="eyebrow" data-i18n="trips.eyebrow">Catalogue</span>
+          <h1 data-i18n="trips.title">All Marrakech excursions</h1>
+          <p data-i18n="trips.intro">
             Filter by category to find desert thrills, Atlas day trips, city experiences,
             wellness rituals and multi-day Sahara journeys.
           </p>
@@ -55,7 +55,7 @@
 
       <div class="container archive-layout">
         <aside class="filters" aria-label="Filter trips">
-          <h2>Filter by category</h2>
+          <h2 data-i18n="trips.filter">Filter by category</h2>
           <ul class="filter-list" id="filter-list"></ul>
         </aside>
 
@@ -74,19 +74,19 @@
         <div class="footer-grid">
           <div>
             <a class="logo" href="/">excursion<span>marrakech</span></a>
-            <p>Premium excursions and desert tours from Marrakech — desert, Atlas, coast & city.</p>
+            <p data-i18n="footer.tagline">Premium excursions and desert tours from Marrakech — desert, Atlas, coast & city.</p>
           </div>
           <div>
-            <h3>Explore</h3>
+            <h3 data-i18n="footer.explore">Explore</h3>
             <ul>
-              <li><a href="/trips">All trips</a></li>
-              <li><a href="/trips?category=desert">Desert adventures</a></li>
-              <li><a href="/trips?category=day-trips">Day trips</a></li>
-              <li><a href="/trips?category=wellness">Wellness</a></li>
+              <li><a href="/trips" data-i18n="footer.allTrips">All trips</a></li>
+              <li><a href="/airport-transfer" data-i18n="footer.transfers">Airport transfers</a></li>
+              <li><a href="/trips?category=desert" data-i18n="footer.desert">Desert adventures</a></li>
+              <li><a href="/trips?category=day-trips" data-i18n="footer.dayTrips">Day trips</a></li>
             </ul>
           </div>
           <div>
-            <h3>Contact</h3>
+            <h3 data-i18n="footer.contact">Contact</h3>
             <ul>
               <li><a href="tel:+212639996960">+212 639 996 960</a></li>
               <li><a href="tel:+212624603887">+212 624 603 887</a></li>
@@ -110,6 +110,8 @@
     <script src="js/data.js" defer></script>
     <script src="js/currency.js" defer></script>
     <script src="js/api.js" defer></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/i18n-trips.js" defer></script>
     <script src="js/tracking.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/trips.js" defer></script>

@@ -22,20 +22,20 @@
           <span></span><span></span><span></span>
         </button>
         <nav id="site-nav" class="nav" data-nav aria-label="Primary">
-          <a href="/" data-page="home">Home</a>
-          <a href="/trips" data-page="trips">All Trips</a>
-          <a href="/about" data-page="about">About</a>
-          <a href="/trips?category=desert">Desert</a>
-          <a class="btn btn--primary" href="/trips">Book an excursion</a>
+          <a href="/" data-page="home" data-i18n="nav.home">Home</a>
+          <a href="/trips" data-page="trips" data-i18n="nav.trips">All Trips</a>
+          <a href="/about" data-page="about" data-i18n="nav.about">About</a>
+          <a href="/airport-transfer" data-page="airport-transfer" data-i18n="nav.transfers">Transfers</a>
+          <a class="btn btn--primary" href="/trips" data-i18n="nav.book">Book an excursion</a>
         </nav>
       </div>
     </header>
 
     <header class="legal-hero">
       <div class="container">
-        <span class="eyebrow">Our story</span>
-        <h1>About excursionmarrakech</h1>
-        <p style="color: var(--ink-muted); max-width: 48ch; margin: 0.5rem 0 0">
+        <span class="eyebrow" data-i18n="about.eyebrow">Our story</span>
+        <h1 data-i18n="about.title">About excursionmarrakech</h1>
+        <p style="color: var(--ink-muted); max-width: 48ch; margin: 0.5rem 0 0" data-i18n="about.tagline">
           Local hosts. Clear pricing. Unforgettable Morocco.
         </p>
       </div>
@@ -44,29 +44,29 @@
     <main class="section">
       <div class="container about-layout">
         <article class="prose about-copy">
-          <h2>Who we are</h2>
-          <p>
+          <h2 data-i18n="about.whoTitle">Who we are</h2>
+          <p data-i18n="about.whoText">
             excursionmarrakech is a Marrakech-based excursion team dedicated to premium desert
             adventures, Atlas day trips, medina experiences and wellness rituals. We design every
             outing for comfort, safety and authentic Moroccan hospitality.
           </p>
 
-          <h2>What we stand for</h2>
+          <h2 data-i18n="about.standTitle">What we stand for</h2>
           <ul>
-            <li>Transparent Private and Group pricing in MAD, with USD, EUR and GBP display</li>
-            <li>Licensed drivers, vetted partners and clear inclusions</li>
-            <li>Personal confirmation for every booking inquiry</li>
-            <li>Support before and during your trip via phone and WhatsApp</li>
+            <li data-i18n="about.stand1">Transparent Private and Group pricing in MAD, with USD, EUR and GBP display</li>
+            <li data-i18n="about.stand2">Licensed drivers, vetted partners and clear inclusions</li>
+            <li data-i18n="about.stand3">Personal confirmation for every booking inquiry</li>
+            <li data-i18n="about.stand4">Support before and during your trip via phone and WhatsApp</li>
           </ul>
 
-          <h2>How booking works</h2>
-          <p>
+          <h2 data-i18n="about.howTitle">How booking works</h2>
+          <p data-i18n="about.howText">
             Choose a trip, pick Private or Group when available, send a booking request with your
             details and preferred date. Our team confirms availability and the next steps by email
             or WhatsApp.
           </p>
 
-          <h2>Contact</h2>
+          <h2 data-i18n="about.contactTitle">Contact</h2>
           <p>
             Phone: <a href="tel:+212639996960">+212 639 996 960</a> ·
             <a href="tel:+212624603887">+212 624 603 887</a><br />
@@ -74,15 +74,15 @@
           </p>
 
           <p style="margin-top: 2rem">
-            <a class="btn btn--primary" href="/trips">Browse excursions</a>
+            <a class="btn btn--primary" href="/trips" data-i18n="about.browse">Browse excursions</a>
           </p>
         </article>
 
         <section class="about-gallery" aria-labelledby="about-gallery-heading">
           <div class="about-gallery__head">
-            <span class="eyebrow">Moments from Morocco</span>
-            <h2 id="about-gallery-heading">Gallery</h2>
-            <p>Scenes from our Marrakech excursions, desert days, and Atlas escapes.</p>
+            <span class="eyebrow" data-i18n="about.galleryEyebrow">Moments from Morocco</span>
+            <h2 id="about-gallery-heading" data-i18n="about.galleryTitle">Gallery</h2>
+            <p data-i18n="about.galleryText">Scenes from our Marrakech excursions, desert days, and Atlas escapes.</p>
           </div>
           <div class="about-gallery__grid">
             <button type="button" class="about-gallery__item" data-gallery-src="images/about/marrakech-01.jpg" aria-label="Open gallery image 1">
@@ -198,6 +198,9 @@
 
     <script src="js/currency.js" defer></script>
     <script src="js/api.js" defer></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/i18n-trips.js" defer></script>
+    <script src="js/tracking.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/about.js" defer></script>
   </body>

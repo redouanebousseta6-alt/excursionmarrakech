@@ -5,20 +5,21 @@ document.addEventListener("DOMContentLoaded", async function () {
   EM.setActiveNav("home");
   EM.ensureHelpers();
   await EM.loadConfig();
+  if (EM.initI18n) EM.initI18n();
   EM.initTracking(EM.config);
   await EM.loadTrips();
 
   var featured = document.getElementById("featured-grid");
   if (featured) {
-    EM.renderTripGrid(featured, EM.getFeatured(6));
+    EM.renderTripGrid(featured, EM.getFeatured(6), { includeTransfer: true });
   }
 
   var catGrid = document.getElementById("category-grid");
-  if (catGrid) {
+  EM.refreshCategoryGrid = function () {
+    if (!catGrid) return;
     var cats = (EM.CATEGORIES || []).filter(function (c) {
       return c.id !== "multi-day";
     });
-    // Ensure images if API-only categories
     var defaults = {
       desert: "https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800&q=80",
       "day-trips": "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=800&q=80",
@@ -28,7 +29,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     catGrid.innerHTML = cats
       .map(function (c) {
         var img = c.image || defaults[c.id] || defaults.desert;
-        var desc = c.description || "";
+        var name = EM.categoryLabel ? EM.categoryLabel(c.id) : c.name;
+        var desc = EM.t ? EM.t("cat." + c.id + ".desc") : c.description || "";
+        if (desc.indexOf("cat.") === 0) desc = c.description || "";
         return (
           '<a class="cat-card" href="' +
           EM.tripsUrl(c.id) +
@@ -38,14 +41,15 @@ document.addEventListener("DOMContentLoaded", async function () {
           '" alt="" loading="lazy" width="600" height="400">' +
           '<div class="cat-card__overlay" aria-hidden="true"></div>' +
           '<div class="cat-card__body"><h3>' +
-          EM.escapeHtml(c.name) +
+          EM.escapeHtml(name) +
           "</h3><p>" +
           EM.escapeHtml(desc) +
           "</p></div></a>"
         );
       })
       .join("");
-  }
+  };
+  EM.refreshCategoryGrid();
 
   var agg = EM.siteAggregateRating();
   var summary = document.getElementById("reviews-summary");
@@ -61,7 +65,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   document.querySelectorAll(".trust-stat").forEach(function (el) {
     var label = el.querySelector("span");
     var strong = el.querySelector("strong");
-    if (label && strong && /guest rating/i.test(label.textContent || "")) {
+    if (!label || !strong) return;
+    var key = label.getAttribute("data-i18n") || "";
+    if (key === "home.statRating" || /guest rating|note des|bewertung|valoraci|تقييم/i.test(label.textContent || "")) {
       strong.textContent = String(agg.ratingValue);
     }
   });

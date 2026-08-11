@@ -4,6 +4,8 @@
 document.addEventListener("DOMContentLoaded", async function () {
   if (window.EM && EM.loadConfig) {
     await EM.loadConfig();
+    if (EM.initI18n) EM.initI18n();
+    EM.initTracking && EM.initTracking(EM.config);
     EM.setActiveNav("about");
   }
 

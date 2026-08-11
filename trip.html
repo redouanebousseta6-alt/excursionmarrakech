@@ -28,11 +28,11 @@
           <span></span><span></span><span></span>
         </button>
         <nav id="site-nav" class="nav" data-nav aria-label="Primary">
-          <a href="/" data-page="home">Home</a>
-          <a href="/trips" data-page="trips">All Trips</a>
-          <a href="/about" data-page="about">About</a>
-          <a href="/trips?category=desert">Desert</a>
-          <a class="btn btn--primary" href="/trips">Book an excursion</a>
+          <a href="/" data-page="home" data-i18n="nav.home">Home</a>
+          <a href="/trips" data-page="trips" data-i18n="nav.trips">All Trips</a>
+          <a href="/about" data-page="about" data-i18n="nav.about">About</a>
+          <a href="/airport-transfer" data-page="airport-transfer" data-i18n="nav.transfers">Transfers</a>
+          <a class="btn btn--primary" href="/trips" data-i18n="nav.book">Book an excursion</a>
         </nav>
       </div>
     </header>
@@ -73,17 +73,17 @@
       <div class="container trip-detail">
         <article class="prose">
           <section aria-labelledby="desc-heading">
-            <h2 id="desc-heading">Description</h2>
+            <h2 id="desc-heading" data-i18n="trip.desc">Description</h2>
             <p id="trip-description"></p>
           </section>
 
           <section aria-labelledby="itin-heading">
-            <h2 id="itin-heading">Itinerary</h2>
+            <h2 id="itin-heading" data-i18n="trip.itinerary">Itinerary</h2>
             <ol id="trip-itinerary"></ol>
           </section>
 
           <section aria-labelledby="incl-heading">
-            <h2 id="incl-heading">What’s included</h2>
+            <h2 id="incl-heading" data-i18n="trip.included">What’s included</h2>
             <ul id="trip-included"></ul>
           </section>
         </article>
@@ -91,7 +91,7 @@
         <aside aria-label="Booking inquiry">
           <div class="booking-card">
             <div class="booking-card__price">
-              <div class="label">Price</div>
+              <div class="label" data-i18n="booking.priceLabel">Price</div>
               <div class="amount" id="display-amount">—</div>
               <div class="unit" id="display-unit"></div>
               <div class="note" id="display-note"></div>
@@ -103,33 +103,33 @@
               <input type="hidden" id="booking-mode" name="pricingSnapshot" value="" />
 
               <div class="form-group">
-                <label for="fullName">Full name</label>
-                <input id="fullName" name="fullName" type="text" autocomplete="name" required placeholder="Your full name" />
+                <label for="fullName" data-i18n="booking.fullName">Full name</label>
+                <input id="fullName" name="fullName" type="text" autocomplete="name" required placeholder="Your full name" data-i18n-placeholder="booking.placeholderName" />
               </div>
 
               <div class="form-group">
-                <label for="email">Email</label>
-                <input id="email" name="email" type="email" autocomplete="email" required placeholder="your.name@gmail.com" />
+                <label for="email" data-i18n="booking.email">Email</label>
+                <input id="email" name="email" type="email" autocomplete="email" required placeholder="your.name@gmail.com" data-i18n-placeholder="booking.placeholderEmail" />
               </div>
 
               <div id="phone-field-mount"></div>
 
               <div class="form-group">
-                <label for="booking-date">Preferred date</label>
+                <label for="booking-date" data-i18n="booking.date">Preferred date</label>
                 <input id="booking-date" name="date" type="date" required />
               </div>
 
               <div class="form-group">
-                <label for="travelers">Number of travelers</label>
+                <label for="travelers" data-i18n="booking.travelers">Number of travelers</label>
                 <input id="travelers" name="travelers" type="number" min="1" max="40" value="2" required />
               </div>
 
               <p class="booking-total" id="display-total">Price: —</p>
 
-              <button class="btn btn--primary btn--full" type="submit">Request Booking</button>
+              <button class="btn btn--primary btn--full" type="submit" data-i18n="booking.submit">Request Booking</button>
 
               <p class="form-hint">
-                By booking you agree to our
+                <span data-i18n="booking.agree">By booking you agree to our</span>
                 <a href="/privacy">Privacy Policy</a>,
                 <a href="/terms-of-use">Terms of Use</a> and
                 <a href="/terms-conditions">Terms &amp; Conditions</a>.
@@ -143,8 +143,8 @@
       <section class="related-trips" id="related-trips" hidden aria-labelledby="related-trips-heading">
         <div class="container">
           <div class="related-trips__head">
-            <h2 id="related-trips-heading">You might also like</h2>
-            <a class="related-trips__all" href="/trips">View all trips →</a>
+            <h2 id="related-trips-heading" data-i18n="trip.related">You might also like</h2>
+            <a class="related-trips__all" href="/trips" data-i18n="trip.relatedAll">View all trips →</a>
           </div>
           <div class="related-trips__wrap">
             <button
@@ -218,6 +218,8 @@
     <script src="js/currency.js" defer></script>
     <script src="js/phone.js" defer></script>
     <script src="js/api.js" defer></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/i18n-trips.js" defer></script>
     <script src="js/tracking.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/trip.js" defer></script>
