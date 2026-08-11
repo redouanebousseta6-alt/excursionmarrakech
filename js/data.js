@@ -890,6 +890,38 @@ EM.TRIPS = [
 })();
 
 /** Homepage guest reviews (placeholder until live reviews) */
+/** Airport transfer guest reviews */
+EM.TRANSFER_REVIEWS = [
+  {
+    name: "Claire D.",
+    location: "Lyon, France",
+    rating: 5,
+    route: "Menara → Medina riad",
+    text: "Landed at 23:40 after a delay. The driver was still there with our name, helped with the suitcases, and knew exactly which alley our riad was on. Fair fixed price — no negotiation at the curb.",
+  },
+  {
+    name: "Tom H.",
+    location: "Manchester, UK",
+    rating: 5,
+    route: "Menara → Palmeraie",
+    text: "Booked on WhatsApp the day before. Clear confirmation, clean car, quiet ride after a long flight. Exactly what you want when you arrive tired with kids.",
+  },
+  {
+    name: "Inés P.",
+    location: "Barcelona, Spain",
+    rating: 5,
+    route: "Menara → Casablanca",
+    text: "Long transfer to Casablanca after our Marrakech stay. Professional driver, agreed EUR price, and we made our evening flight with time to spare. Will use again on the way back.",
+  },
+  {
+    name: "Jonas W.",
+    location: "Hamburg, Germany",
+    rating: 5,
+    route: "VIP Mercedes · Menara → Al Maaden",
+    text: "Chose the Mercedes for a business arrival. Discreet, on time, and much calmer than fighting for a taxi outside the terminal. Worth it after an early flight.",
+  },
+];
+
 EM.REVIEWS = [
   {
     name: "Sophie M.",

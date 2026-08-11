@@ -1976,48 +1976,75 @@ body.lightbox-open {
   color: var(--ink-muted);
 }
 
-.transfer-steps {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.transfer-book {
   display: grid;
-  gap: 1rem;
+  gap: 2rem;
+  max-width: 52rem;
 }
 
-@media (min-width: 768px) {
-  .transfer-steps {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
+@media (min-width: 900px) {
+  .transfer-book {
+    grid-template-columns: 1.4fr 0.9fr;
+    align-items: end;
+    max-width: none;
+    gap: 3rem;
   }
 }
 
-.transfer-steps li {
-  background: rgba(246, 234, 215, 0.08);
-  border: 1px solid rgba(246, 234, 215, 0.16);
-  border-radius: 10px;
-  padding: 1.25rem 1.35rem;
-  counter-increment: transfer-step;
+.transfer-book__copy h2 {
+  margin: 0.35rem 0 1rem;
+  max-width: 22ch;
 }
 
-.transfer-steps {
-  counter-reset: transfer-step;
+.transfer-book__copy p {
+  color: rgba(246, 234, 215, 0.78);
+  margin: 0 0 1rem;
+  max-width: 48ch;
 }
 
-.transfer-steps li strong {
-  display: block;
-  margin-bottom: 0.35rem;
-  color: var(--sand);
-  font-size: 1.05rem;
+.transfer-book__checklist {
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
 }
 
-.transfer-steps li strong::before {
-  content: counter(transfer-step) ". ";
-  color: var(--sunset);
+.transfer-book__checklist li {
+  position: relative;
+  padding-left: 1.15rem;
+  color: rgba(246, 234, 215, 0.88);
+  font-size: 0.98rem;
 }
 
-.transfer-steps li span {
-  color: rgba(246, 234, 215, 0.72);
-  font-size: 0.95rem;
+.transfer-book__checklist li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 1px;
+  background: var(--sunset);
+}
+
+.transfer-book__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.transfer-book__phones {
+  margin: 0.5rem 0 0;
+  font-size: 0.92rem;
+  color: rgba(246, 234, 215, 0.65);
+}
+
+.transfer-book__phones a {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 .transfer-faq {
