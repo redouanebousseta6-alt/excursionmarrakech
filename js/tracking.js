@@ -1,11 +1,15 @@
 /**
  * Tracking — GA4, Google Ads, Meta Pixel (consent-aware)
  * IDs come from /api/config (env vars on the server).
+ * GA tag is also embedded in page <head> so Google can detect it;
+ * cookies/storage stay denied until the visitor accepts.
  */
 (function () {
   "use strict";
 
   var CONSENT_KEY = "em_tracking_consent";
+  /** Fallback when production .env is missing GA_MEASUREMENT_ID */
+  var FALLBACK_GA_ID = "G-3JSSYBLXW5";
 
   function getConsent() {
     try {
@@ -32,46 +36,56 @@
     }
   }
 
-  function loadGtagScript() {
+  function resolveGaId(config) {
+    return (config && config.googleAnalyticsId) || FALLBACK_GA_ID || "";
+  }
+
+  function loadGtagScript(gaId) {
     if (document.querySelector("script[data-em-gtag]")) return;
+    if (document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) return;
+    if (!gaId) return;
     var s = document.createElement("script");
     s.async = true;
-    s.src = "https://www.googletagmanager.com/gtag/js";
+    s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(gaId);
     s.setAttribute("data-em-gtag", "1");
     document.head.appendChild(s);
   }
 
-  function injectGoogleTags(config) {
-    var gaId = config.googleAnalyticsId || "";
-    var adsId = config.googleAdsId || "";
-    if (!gaId && !adsId) return;
-
+  function setConsentGranted() {
     ensureDataLayer();
-    loadGtagScript();
-    // Reload script with first ID for reliability
-    var primary = gaId || adsId;
-    var existing = document.querySelector("script[data-em-gtag]");
-    if (existing && !existing.src.includes("id=")) {
-      existing.src =
-        "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(primary);
-    }
-
-    window.gtag("js", new Date());
     window.gtag("consent", "update", {
       analytics_storage: "granted",
       ad_storage: "granted",
       ad_user_data: "granted",
       ad_personalization: "granted",
     });
+  }
+
+  function injectGoogleTags(config, opts) {
+    opts = opts || {};
+    var gaId = resolveGaId(config);
+    var adsId = (config && config.googleAdsId) || "";
+    if (!gaId && !adsId) return;
+
+    ensureDataLayer();
+    loadGtagScript(gaId || adsId);
+
+    window.gtag("js", new Date());
+
+    if (opts.grantConsent) setConsentGranted();
 
     if (gaId) {
       window.gtag("config", gaId, {
         anonymize_ip: true,
-        send_page_view: true,
+        send_page_view: !!opts.grantConsent,
       });
     }
     if (adsId) {
       window.gtag("config", adsId);
+    }
+
+    if (opts.grantConsent && gaId) {
+      window.gtag("event", "page_view");
     }
   }
 
@@ -153,7 +167,7 @@
       setConsent(value);
       bar.remove();
       if (value === "granted") {
-        injectGoogleTags(config);
+        injectGoogleTags(config, { grantConsent: true });
         injectMetaPixel(config.metaPixelId);
       }
     });
@@ -164,23 +178,27 @@
   EM.getTrackingConsent = getConsent;
 
   EM.initTracking = function (config) {
-    if (!config) return;
+    if (!config) config = {};
     injectSiteVerification(config.googleSiteVerification);
 
     denyConsentDefaults();
 
+    var gaId = resolveGaId(config);
+    var hasMarketing = !!(gaId || config.googleAdsId || config.metaPixelId);
+
+    // Always register the Google tag (so GA can detect it), but keep storage denied
+    // until the visitor accepts cookies.
+    if (gaId || config.googleAdsId) {
+      injectGoogleTags(config, { grantConsent: false });
+    }
+
     var consent = getConsent();
-    // Outside EU-style consent: still show banner once; if already granted, load tags.
     if (consent === "granted") {
-      injectGoogleTags(config);
+      injectGoogleTags(config, { grantConsent: true });
       injectMetaPixel(config.metaPixelId);
       return;
     }
     if (consent === "denied") return;
-
-    // Auto-load when no marketing IDs configured (local/dev), otherwise ask.
-    var hasMarketing =
-      !!(config.googleAnalyticsId || config.googleAdsId || config.metaPixelId);
     if (!hasMarketing) return;
     mountConsentBanner(config);
   };
@@ -223,7 +241,6 @@
       window.gtag("event", name, gaParams);
     }
 
-    // Google Ads conversion (optional label from config)
     var adsId = EM.config && EM.config.googleAdsId;
     var label = EM.config && EM.config.googleAdsConversionLabel;
     if (
