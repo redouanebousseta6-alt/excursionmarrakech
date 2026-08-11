@@ -192,7 +192,19 @@ app.get("/:slug", (req, res, next) => {
   return sendPage(res, "trip.html");
 });
 
-app.use(express.static(root, { index: false }));
+app.use(
+  express.static(root, {
+    index: false,
+    maxAge: "7d",
+    setHeaders(res, filePath) {
+      if (/\.(?:webp|avif|jpe?g|png|gif|svg|woff2)$/i.test(filePath)) {
+        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      } else if (/\.(?:css|js)$/i.test(filePath)) {
+        res.setHeader("Cache-Control", "public, max-age=604800");
+      }
+    },
+  })
+);
 
 app.use((req, res) => {
   res.status(404).type("text").send("Not found");

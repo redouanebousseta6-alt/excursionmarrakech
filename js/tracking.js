@@ -51,6 +51,28 @@
     document.head.appendChild(s);
   }
 
+  function whenBrowserIdle(fn) {
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(fn, { timeout: 4000 });
+      return;
+    }
+    window.setTimeout(fn, 2000);
+  }
+
+  function afterLoad(fn) {
+    if (document.readyState === "complete") {
+      whenBrowserIdle(fn);
+      return;
+    }
+    window.addEventListener(
+      "load",
+      function () {
+        whenBrowserIdle(fn);
+      },
+      { once: true }
+    );
+  }
+
   function setConsentGranted() {
     ensureDataLayer();
     window.gtag("consent", "update", {
@@ -68,25 +90,28 @@
     if (!gaId && !adsId) return;
 
     ensureDataLayer();
-    loadGtagScript(gaId || adsId);
 
-    window.gtag("js", new Date());
-
-    if (opts.grantConsent) setConsentGranted();
-
-    if (gaId) {
-      window.gtag("config", gaId, {
-        anonymize_ip: true,
-        send_page_view: !!opts.grantConsent,
-      });
+    function apply() {
+      loadGtagScript(gaId || adsId);
+      window.gtag("js", new Date());
+      if (opts.grantConsent) setConsentGranted();
+      if (gaId) {
+        window.gtag("config", gaId, {
+          anonymize_ip: true,
+          send_page_view: !!opts.grantConsent,
+        });
+      }
+      if (adsId) {
+        window.gtag("config", adsId);
+      }
+      if (opts.grantConsent && gaId) {
+        window.gtag("event", "page_view");
+      }
     }
-    if (adsId) {
-      window.gtag("config", adsId);
-    }
 
-    if (opts.grantConsent && gaId) {
-      window.gtag("event", "page_view");
-    }
+    // Defer network load so LCP/FCP are not competing with Analytics.
+    if (opts.immediate) apply();
+    else afterLoad(apply);
   }
 
   function injectMetaPixel(id) {
@@ -167,7 +192,7 @@
       setConsent(value);
       bar.remove();
       if (value === "granted") {
-        injectGoogleTags(config, { grantConsent: true });
+        injectGoogleTags(config, { grantConsent: true, immediate: true });
         injectMetaPixel(config.metaPixelId);
       }
     });
@@ -194,7 +219,7 @@
 
     var consent = getConsent();
     if (consent === "granted") {
-      injectGoogleTags(config, { grantConsent: true });
+      injectGoogleTags(config, { grantConsent: true, immediate: true });
       injectMetaPixel(config.metaPixelId);
       return;
     }
