@@ -104,6 +104,9 @@
     var t = EM.t || function (k) {
       return k;
     };
+    var rating = EM.getTransferRating
+      ? EM.getTransferRating()
+      : { rating: 4.9, reviewCount: 4 };
     return (
       '<article class="trip-card trip-card--transfer">' +
       '<a class="trip-card__media" href="' +
@@ -121,9 +124,17 @@
       "</span>" +
       "</a>" +
       '<div class="trip-card__body">' +
-      '<div class="trip-card__meta"><span>' +
+      '<div class="trip-card__meta">' +
+      "<span>" +
       EM.escapeHtml(t("transfer.cardMeta")) +
-      "</span></div>" +
+      "</span>" +
+      '<span class="trip-card__rating">' +
+      EM.starsHtml(rating.rating, { className: "stars--sm" }) +
+      '<span class="trip-card__reviews">(' +
+      rating.reviewCount +
+      ")</span>" +
+      "</span>" +
+      "</div>" +
       "<h3><a href=\"" +
       href +
       '">' +

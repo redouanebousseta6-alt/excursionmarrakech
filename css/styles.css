@@ -2054,7 +2054,18 @@ body.lightbox-open {
   text-underline-offset: 0.15em;
 }
 
-.transfer-faq {
+.transfer-reviews__summary {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: -0.5rem 0 1.25rem;
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+}
+
+.transfer-reviews__summary .stars {
+  margin-right: 0.15rem;
+}
   max-width: 48rem;
 }
 

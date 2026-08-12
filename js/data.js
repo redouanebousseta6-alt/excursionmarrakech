@@ -922,6 +922,18 @@ EM.TRANSFER_REVIEWS = [
   },
 ];
 
+/** Aggregate rating for airport transfers (card UI + JSON-LD) */
+EM.getTransferRating = function () {
+  var reviews = EM.TRANSFER_REVIEWS || [];
+  if (!reviews.length) return { rating: 4.9, reviewCount: 0 };
+  var sum = 0;
+  reviews.forEach(function (r) {
+    sum += Number(r.rating) || 0;
+  });
+  var avg = Math.round((sum / reviews.length) * 10) / 10;
+  return { rating: avg, reviewCount: reviews.length };
+};
+
 EM.REVIEWS = [
   {
     name: "Sophie M.",

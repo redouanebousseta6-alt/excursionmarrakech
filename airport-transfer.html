@@ -305,6 +305,7 @@
               Late flights, name boards, luggage and a quiet ride into Marrakech — what people write after they land.
             </p>
           </div>
+          <p class="transfer-reviews__summary" id="transfer-reviews-summary" hidden></p>
           <div class="reviews-grid" id="transfer-reviews-grid"></div>
         </div>
       </section>
@@ -432,7 +433,7 @@
       </div>
     </footer>
 
-    <script type="application/ld+json">
+    <script type="application/ld+json" id="transfer-schema">
       {
         "@context": "https://schema.org",
         "@type": "Service",
@@ -489,6 +490,7 @@
               if (EM.initI18n) EM.initI18n();
               EM.initTracking && EM.initTracking(EM.config);
               if (EM.renderTransferReviews) EM.renderTransferReviews();
+              if (EM.injectTransferSchema) EM.injectTransferSchema();
             });
         }
       });
