@@ -1,4 +1,5 @@
 require("dotenv").config();
+const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
@@ -13,6 +14,8 @@ seedIfEmpty();
 const app = express();
 const PORT = process.env.PORT || 3000;
 const root = path.join(__dirname, "..");
+/** Bump on frontend deploys so browsers skip stale CSS/JS (7d cache). */
+const ASSET_VERSION = process.env.ASSET_VERSION || "20260812c";
 
 const PAGE_FILES = {
   trips: "trips.html",
@@ -41,8 +44,18 @@ const RESERVED_SLUGS = new Set([
   "sitemap.xml",
 ]);
 
+function withAssetVersion(html) {
+  return html.replace(
+    /(href|src)="(\/?((?:css|js|fonts)\/[^"?]+)\.(?:css|js))"/g,
+    (_, attr, url) => `${attr}="${url}?v=${ASSET_VERSION}"`
+  );
+}
+
 function sendPage(res, file) {
-  res.sendFile(path.join(root, file));
+  const htmlPath = path.join(root, file);
+  const html = withAssetVersion(fs.readFileSync(htmlPath, "utf8"));
+  res.setHeader("Cache-Control", "no-cache");
+  res.type("html").send(html);
 }
 
 function withQuery(req) {
@@ -200,7 +213,14 @@ app.use(
       if (/\.(?:webp|avif|jpe?g|png|gif|svg|woff2)$/i.test(filePath)) {
         res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
       } else if (/\.(?:css|js)$/i.test(filePath)) {
-        res.setHeader("Cache-Control", "public, max-age=604800");
+        // Long-lived only when URL is versioned (?v=); unversioned stays short.
+        const versioned = String(res.req && res.req.query && res.req.query.v || "");
+        res.setHeader(
+          "Cache-Control",
+          versioned
+            ? "public, max-age=604800, immutable"
+            : "public, max-age=300, must-revalidate"
+        );
       }
     },
   })
