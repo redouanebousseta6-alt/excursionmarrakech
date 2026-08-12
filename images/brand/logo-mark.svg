@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="excursionmarrakech">
+  <defs>
+    <linearGradient id="sky" x1="32" y1="2" x2="32" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#e07a3d"/>
+      <stop offset="100%" stop-color="#9a3f14"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#sky)"/>
+  <circle cx="41" cy="22" r="10.5" fill="#faf6f0"/>
+  <path d="M2 44 C10 38 18 40 26 44 C34 48 40 40 48 42 C54 43.5 58 40 62 41 L62 62 L2 62 Z" fill="#e8c9a0"/>
+  <path d="M2 51 C12 45 20 48 28 52 C36 56 44 48 52 50 C57 51.5 60 49 62 50 L62 62 L2 62 Z" fill="#d4a574"/>
+  <path d="M16 52 L20.5 45 L25 52 Z" fill="#5a2d14" opacity="0.85"/>
+</svg>

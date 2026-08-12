@@ -15,7 +15,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const root = path.join(__dirname, "..");
 /** Bump on frontend deploys so browsers skip stale CSS/JS (7d cache). */
-const ASSET_VERSION = process.env.ASSET_VERSION || "20260812c";
+const ASSET_VERSION = process.env.ASSET_VERSION || "20260812d";
 
 const PAGE_FILES = {
   trips: "trips.html",
@@ -51,9 +51,26 @@ function withAssetVersion(html) {
   );
 }
 
+/** Favicon + PWA links for browser tabs and Google Search results. */
+function withSeoIcons(html) {
+  if (/rel=["']icon["']/i.test(html)) return html;
+  const v = ASSET_VERSION;
+  const links = [
+    `<link rel="icon" href="/favicon.ico" sizes="any" />`,
+    `<link rel="icon" href="/favicon.svg?v=${v}" type="image/svg+xml" />`,
+    `<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png?v=${v}" />`,
+    `<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=${v}" />`,
+    `<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=${v}" />`,
+    `<link rel="manifest" href="/site.webmanifest?v=${v}" />`,
+    `<meta name="theme-color" content="#c45c26" />`,
+    `<meta name="msapplication-TileColor" content="#c45c26" />`,
+  ].join("\n    ");
+  return html.replace(/<\/head>/i, `    ${links}\n  </head>`);
+}
+
 function sendPage(res, file) {
   const htmlPath = path.join(root, file);
-  const html = withAssetVersion(fs.readFileSync(htmlPath, "utf8"));
+  const html = withAssetVersion(withSeoIcons(fs.readFileSync(htmlPath, "utf8")));
   res.setHeader("Cache-Control", "no-cache");
   res.type("html").send(html);
 }
@@ -210,11 +227,16 @@ app.use(
     index: false,
     maxAge: "7d",
     setHeaders(res, filePath) {
-      if (/\.(?:webp|avif|jpe?g|png|gif|svg|woff2)$/i.test(filePath)) {
+      if (/\.webmanifest$/i.test(filePath)) {
+        res.setHeader("Content-Type", "application/manifest+json; charset=utf-8");
+        res.setHeader("Cache-Control", "public, max-age=86400");
+      } else if (/\.(?:ico)$/i.test(filePath)) {
+        res.setHeader("Cache-Control", "public, max-age=604800");
+      } else if (/\.(?:webp|avif|jpe?g|png|gif|svg|woff2)$/i.test(filePath)) {
         res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
       } else if (/\.(?:css|js)$/i.test(filePath)) {
         // Long-lived only when URL is versioned (?v=); unversioned stays short.
-        const versioned = String(res.req && res.req.query && res.req.query.v || "");
+        const versioned = String((res.req && res.req.query && res.req.query.v) || "");
         res.setHeader(
           "Cache-Control",
           versioned

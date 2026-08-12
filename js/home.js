@@ -113,6 +113,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       (EM.SITE && EM.SITE.tagline) ||
       "Premium Marrakech excursions and desert tours",
     url: (EM.SITE && EM.SITE.url) || "https://excursionmarrakech.net",
+    logo: (EM.SITE && EM.SITE.logo) || undefined,
+    image: (EM.SITE && EM.SITE.image) || (EM.SITE && EM.SITE.logo) || undefined,
     telephone: (EM.SITE && EM.SITE.phone) || undefined,
     email: (EM.SITE && EM.SITE.email) || undefined,
     address: {

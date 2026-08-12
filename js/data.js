@@ -12,6 +12,8 @@ EM.SITE = {
   phoneAlt: "+212 624 603 887",
   email: "silversandstravels@gmail.com",
   url: "https://excursionmarrakech.net",
+  logo: "https://excursionmarrakech.net/images/brand/logo-512.png",
+  image: "https://excursionmarrakech.net/images/home/hero-1280.jpg",
 };
 
 EM.CATEGORIES = [
