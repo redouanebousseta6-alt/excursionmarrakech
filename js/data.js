@@ -56,6 +56,7 @@ EM.CATEGORIES = [
  * - type "options": radio options with custom labels
  * - type "driver-passenger": driver / passenger rates
  * - minPrivate: minimum persons for private booking
+ * - minGroup: minimum persons for group booking
  */
 EM.TRIPS = [
   {

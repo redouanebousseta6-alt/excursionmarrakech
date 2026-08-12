@@ -78,7 +78,14 @@ body {
 }
 .brand { font-weight: 700; font-size: 1.05rem; }
 .brand span { color: #e07a3d; }
-.sidebar nav { display: grid; gap: 0.35rem; flex: 1; }
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  align-items: stretch;
+  justify-content: flex-start;
+}
 .nav-btn, .sidebar a, .logout {
   background: transparent;
   border: 0;
@@ -89,9 +96,12 @@ body {
   cursor: pointer;
   font: inherit;
   text-decoration: none;
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: 0;
 }
 .nav-btn.is-active, .nav-btn:hover { background: rgba(255,255,255,0.08); }
-.logout { border: 1px solid rgba(255,255,255,0.15); }
+.logout { border: 1px solid rgba(255,255,255,0.15); margin-top: auto; }
 .main { padding: 1.5rem; }
 .view-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; }

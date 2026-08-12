@@ -200,9 +200,36 @@ document.addEventListener("DOMContentLoaded", async function () {
   var modeInput = document.getElementById("booking-mode");
   var p = trip.pricing;
 
-  function currentTravelers() {
+  function minTravelersRequired() {
+    var pricing = trip.pricing || {};
+    if (pricing.type !== "private-group") return 1;
+    if (selection.mode === "private" && pricing.minPrivate) {
+      return Math.max(1, Number(pricing.minPrivate) || 1);
+    }
+    if (selection.mode === "group" && pricing.minGroup) {
+      return Math.max(1, Number(pricing.minGroup) || 1);
+    }
+    return 1;
+  }
+
+  function syncTravelersField() {
     var el = document.getElementById("travelers");
-    return Math.max(1, Number(el && el.value) || 1);
+    if (!el) return minTravelersRequired();
+    var min = minTravelersRequired();
+    el.min = String(min);
+    el.setAttribute("aria-valuemin", String(min));
+    var current = Number(el.value);
+    if (!Number.isFinite(current) || current < min) {
+      el.value = String(min);
+    }
+    return min;
+  }
+
+  function currentTravelers() {
+    syncTravelersField();
+    var el = document.getElementById("travelers");
+    var min = minTravelersRequired();
+    return Math.max(min, Number(el && el.value) || min);
   }
 
   function localizeUnit(unit) {
@@ -263,6 +290,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           groupLabel +
           '<span class="opt-price">' +
           EM.formatPrice(p.groupPrice) +
+          (p.minGroup ? " · " + minLabel + " " + p.minGroup : "") +
           "</span></label></div>";
       }
       if (hasPrivate) {
@@ -281,9 +309,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       pricingMount.querySelectorAll('input[name="bookType"]').forEach(function (input) {
         input.addEventListener("change", function () {
           selection.mode = input.value;
+          syncTravelersField();
           updatePriceDisplay();
         });
       });
+      syncTravelersField();
       return;
     }
 
@@ -342,9 +372,11 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   buildPricingControls();
+  syncTravelersField();
   updatePriceDisplay();
   EM._rebuildTripPricing = function () {
     buildPricingControls();
+    syncTravelersField();
     updatePriceDisplay();
   };
   EM.refreshTripPrice = function () {
@@ -401,6 +433,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
     if (!payload.fullName || !payload.email || !payload.date || !payload.travelers) {
       throw new Error("Please fill in all booking fields");
+    }
+    var minTravelers = minTravelersRequired();
+    if (payload.travelers < minTravelers) {
+      syncTravelersField();
+      throw new Error("Minimum " + minTravelers + " travelers required for this option");
     }
     return EM.api("/bookings", {
       method: "POST",

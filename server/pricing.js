@@ -30,7 +30,11 @@ function resolveUnitPrice(pricing, selection = {}) {
       };
     }
     if (mode === "group" && pricing.groupPrice != null) {
-      return { amount: pricing.groupPrice, unit: pricing.unit || "per person", note: pricing.note || "" };
+      return {
+        amount: pricing.groupPrice,
+        unit: pricing.unit || "per person",
+        note: pricing.minGroup ? `Minimum ${pricing.minGroup} persons` : pricing.note || "",
+      };
     }
     const fallback = pricing.groupPrice != null ? pricing.groupPrice : pricing.privatePrice;
     return { amount: fallback, unit: pricing.unit || "per person", note: pricing.note || "" };

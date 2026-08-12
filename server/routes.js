@@ -115,6 +115,18 @@ router.post("/bookings", (req, res) => {
   const row = db.prepare("SELECT * FROM trips WHERE id = ? AND active = 1").get(tripId);
   if (!row) return res.status(404).json({ error: "Trip not found" });
   const trip = rowToTrip(row);
+  const pricing = trip.pricing || {};
+  let minTravelers = 1;
+  if (pricing.type === "private-group") {
+    const mode = (selection && selection.mode) || (pricing.groupPrice != null ? "group" : "private");
+    if (mode === "private" && pricing.minPrivate) minTravelers = Number(pricing.minPrivate) || 1;
+    if (mode === "group" && pricing.minGroup) minTravelers = Number(pricing.minGroup) || 1;
+  }
+  if (travelersCount < minTravelers) {
+    return res
+      .status(400)
+      .json({ error: `Minimum ${minTravelers} travelers required for this option` });
+  }
   const priced = computeTotal(trip.pricing, selection, travelersCount);
   if (priced.amount == null) {
     return res.status(400).json({ error: "Unable to resolve price" });

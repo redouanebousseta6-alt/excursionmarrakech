@@ -60,7 +60,7 @@ $("#login-form").addEventListener("submit", async (e) => {
     console.error(err);
     errEl.textContent =
       err.message === "Failed to fetch"
-        ? "Cannot reach the server. Open http://localhost:3000/admin/ (not port 8080) and keep npm start running."
+        ? "Cannot reach the server. Check your connection and try again."
         : err.message || "Login failed";
     errEl.hidden = false;
   } finally {
@@ -132,7 +132,7 @@ function renderBookingsTable(bookings, targetSel) {
           </tr>`
                 )
                 .join("")
-            : `<tr><td colspan="7">No orders yet. Submit a booking from a trip page on <strong>http://localhost:3000</strong>.</td></tr>`
+            : `<tr><td colspan="7">No orders yet. When a guest submits a booking from a trip page, it will appear here.</td></tr>`
         }
       </tbody>
     </table>`;
@@ -366,6 +366,7 @@ function openTripDialog(trip) {
     form.privatePrice.value = p.privatePrice || "";
     form.groupPrice.value = p.groupPrice || "";
     form.minPrivate.value = p.minPrivate || "";
+    form.minGroup.value = p.minGroup || "";
   } else {
     form.active.checked = true;
     form.pricingType.value = "flat";
@@ -387,6 +388,7 @@ form.addEventListener("submit", async (e) => {
       groupPrice: fd.get("groupPrice") ? Number(fd.get("groupPrice")) : null,
       unit: "per person",
       minPrivate: fd.get("minPrivate") ? Number(fd.get("minPrivate")) : undefined,
+      minGroup: fd.get("minGroup") ? Number(fd.get("minGroup")) : undefined,
     };
   } else {
     pricing = { type: "flat", price: Number(fd.get("flatPrice") || 0), unit: "per person" };

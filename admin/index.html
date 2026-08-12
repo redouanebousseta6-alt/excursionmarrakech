@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex,nofollow" />
     <title>Admin · excursionmarrakech</title>
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -15,11 +18,10 @@
       <form id="login-form" class="login-card">
         <h1>excursionmarrakech</h1>
         <p>Admin dashboard</p>
-        <label>Email<input type="email" name="email" required value="admin@excursionmarrakech.com" autocomplete="username" /></label>
-        <label>Password<input type="password" name="password" required value="Admin123!" autocomplete="current-password" /></label>
+        <label>Email<input type="email" name="email" required autocomplete="username" placeholder="you@example.com" /></label>
+        <label>Password<input type="password" name="password" required autocomplete="current-password" placeholder="••••••••" /></label>
         <button type="submit">Sign in</button>
         <p id="login-error" class="error" hidden></p>
-        <p class="login-hint">Use <strong>http://localhost:3000/admin/</strong> with <code>npm start</code> running.</p>
       </form>
     </div>
 
@@ -125,6 +127,7 @@
           <label>Private (MAD)<input name="privatePrice" type="number" min="0" /></label>
           <label>Group (MAD)<input name="groupPrice" type="number" min="0" /></label>
           <label>Min private<input name="minPrivate" type="number" min="1" /></label>
+          <label>Min group<input name="minGroup" type="number" min="1" /></label>
         </div>
         <label>Itinerary (one step per line)<textarea name="itinerary" rows="4"></textarea></label>
         <label>Included (one item per line)<textarea name="included" rows="3"></textarea></label>

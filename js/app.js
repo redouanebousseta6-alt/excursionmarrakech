@@ -353,7 +353,7 @@
         return {
           amount: p.groupPrice,
           unit: p.unit || "per person",
-          note: p.note || "",
+          note: p.minGroup ? "Minimum " + p.minGroup + " persons" : p.note || "",
         };
       }
       var fallback = p.groupPrice != null ? p.groupPrice : p.privatePrice;
