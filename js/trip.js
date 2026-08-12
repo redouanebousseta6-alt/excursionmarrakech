@@ -467,7 +467,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       success.textContent =
         "Error: " +
         (err.message === "Failed to fetch"
-          ? "Cannot reach server. Use http://localhost:3000 (npm start must be running)."
+          ? "Cannot reach the server. Please check your connection and try again."
           : err.message);
       if (submitBtn) {
         submitBtn.disabled = false;
