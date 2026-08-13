@@ -13,7 +13,7 @@ EM.SITE = {
   email: "silversandstravels@gmail.com",
   url: "https://excursionmarrakech.net",
   logo: "https://excursionmarrakech.net/images/brand/logo-512.png",
-  image: "https://excursionmarrakech.net/images/home/hero-1280.jpg",
+  image: "https://excursionmarrakech.net/images/brand/og-default.jpg",
 };
 
 EM.CATEGORIES = [

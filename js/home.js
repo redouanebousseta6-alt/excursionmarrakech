@@ -114,7 +114,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       "Premium Marrakech excursions and desert tours",
     url: (EM.SITE && EM.SITE.url) || "https://excursionmarrakech.net",
     logo: (EM.SITE && EM.SITE.logo) || undefined,
-    image: (EM.SITE && EM.SITE.image) || (EM.SITE && EM.SITE.logo) || undefined,
+    image:
+      (EM.SITE && EM.SITE.image) ||
+      (EM.SEO && EM.SEO.defaultImage && EM.SEO.defaultImage()) ||
+      undefined,
     telephone: (EM.SITE && EM.SITE.phone) || undefined,
     email: (EM.SITE && EM.SITE.email) || undefined,
     address: {
@@ -122,6 +125,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       addressLocality: "Marrakech",
       addressCountry: "MA",
     },
+    hasMerchantReturnPolicy:
+      EM.SEO && EM.SEO.merchantReturnPolicy ? EM.SEO.merchantReturnPolicy() : undefined,
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: agg.ratingValue,
@@ -148,8 +153,12 @@ document.addEventListener("DOMContentLoaded", async function () {
       };
     }),
   };
-  var script = document.createElement("script");
-  script.type = "application/ld+json";
-  script.textContent = JSON.stringify(schema);
-  document.head.appendChild(script);
+  if (EM.SEO && EM.SEO.injectJsonLd) EM.SEO.injectJsonLd("home-org-schema", schema);
+  else {
+    var script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify(schema);
+    document.head.appendChild(script);
+  }
+  if (EM.SEO && EM.SEO.applyPageMeta) EM.SEO.applyPageMeta("home");
 });

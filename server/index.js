@@ -8,6 +8,7 @@ const { seedIfEmpty } = require("./seed");
 const { router: apiRouter } = require("./routes");
 const { router: paymentsRouter, stripeWebhookHandler } = require("./payments");
 const { startingPrice, CATEGORIES } = require("./pricing");
+const { buildTripSchema, withCrawlerSeo } = require("./seo");
 
 seedIfEmpty();
 
@@ -15,7 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const root = path.join(__dirname, "..");
 /** Bump on frontend deploys so browsers skip stale CSS/JS (7d cache). */
-const ASSET_VERSION = process.env.ASSET_VERSION || "20260812e";
+const ASSET_VERSION = process.env.ASSET_VERSION || "20260813a";
 
 const PAGE_FILES = {
   trips: "trips.html",
@@ -68,9 +69,14 @@ function withSeoIcons(html) {
   return html.replace(/<\/head>/i, `    ${links}\n  </head>`);
 }
 
-function sendPage(res, file) {
+function sendPage(res, file, req) {
   const htmlPath = path.join(root, file);
-  const html = withAssetVersion(withSeoIcons(fs.readFileSync(htmlPath, "utf8")));
+  let html = fs.readFileSync(htmlPath, "utf8");
+  const pathName = (req && req.path) || "/";
+  const langParam = req && req.query && typeof req.query.lang === "string" ? req.query.lang : "en";
+  const lang = ["en", "fr", "de", "es", "ar"].includes(langParam) ? langParam : "en";
+  html = withCrawlerSeo(html, { path: pathName, lang });
+  html = withAssetVersion(withSeoIcons(html));
   res.setHeader("Cache-Control", "no-cache");
   res.type("html").send(html);
 }
@@ -148,27 +154,7 @@ app.get("/api/trips/:id/schema", (req, res) => {
   const trip = rowToTrip(row);
   const site = process.env.SITE_URL || `http://localhost:${PORT}`;
   const low = startingPrice(trip.pricing);
-  res.json({
-    "@context": "https://schema.org",
-    "@type": ["Product", "TouristTrip"],
-    name: trip.title,
-    description: trip.shortDescription,
-    image: trip.image,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: trip.rating,
-      reviewCount: trip.reviewCount,
-      bestRating: 5,
-      worstRating: 1,
-    },
-    offers: {
-      "@type": "Offer",
-      priceCurrency: "MAD",
-      price: low,
-      availability: "https://schema.org/InStock",
-      url: `${site}/${encodeURIComponent(trip.id)}`,
-    },
-  });
+  res.json(buildTripSchema(trip, { site, lowPrice: low }));
 });
 
 // Legacy HTML → clean URLs
@@ -204,10 +190,10 @@ app.get("/:page.html", (req, res, next) => {
 });
 
 // Clean page routes
-app.get("/", (_req, res) => sendPage(res, "index.html"));
+app.get("/", (req, res) => sendPage(res, "index.html", req));
 
 Object.entries(PAGE_FILES).forEach(([slug, file]) => {
-  app.get(`/${slug}`, (_req, res) => sendPage(res, file));
+  app.get(`/${slug}`, (req, res) => sendPage(res, file, req));
 });
 
 app.use("/uploads", express.static(path.join(root, "uploads")));
@@ -219,7 +205,7 @@ app.get("/:slug", (req, res, next) => {
   if (RESERVED_SLUGS.has(slug) || slug.includes(".")) return next();
   const row = db.prepare("SELECT id FROM trips WHERE id = ? AND active = 1").get(slug);
   if (!row) return next();
-  return sendPage(res, "trip.html");
+  return sendPage(res, "trip.html", req);
 });
 
 app.use(

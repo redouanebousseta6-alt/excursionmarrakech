@@ -525,38 +525,57 @@ document.addEventListener("DOMContentLoaded", async function () {
     success.textContent = "Payment was cancelled. You can try again or send an inquiry instead.";
   }
 
-  // JSON-LD
+  // JSON-LD — Product + TouristTrip with full Merchant Offer fields
+  var tripUrl =
+    ((EM.config && EM.config.siteUrl) || "https://excursionmarrakech.net").replace(/\/$/, "") +
+    "/" +
+    encodeURIComponent(trip.id);
   var offers = [];
   if (p.type === "flat") {
     offers.push({
-      "@type": "Offer",
+      name: trip.title,
       price: p.price,
       priceCurrency: "MAD",
-      availability: "https://schema.org/InStock",
     });
   } else if (p.type === "private-group") {
     if (p.groupPrice != null)
-      offers.push({ "@type": "Offer", name: "Group", price: p.groupPrice, priceCurrency: "MAD" });
+      offers.push({ name: "Group — " + trip.title, price: p.groupPrice, priceCurrency: "MAD" });
     if (p.privatePrice != null)
-      offers.push({ "@type": "Offer", name: "Private", price: p.privatePrice, priceCurrency: "MAD" });
+      offers.push({ name: "Private — " + trip.title, price: p.privatePrice, priceCurrency: "MAD" });
   } else if (p.type === "options") {
     p.options.forEach(function (o) {
-      offers.push({ "@type": "Offer", name: o.label, price: o.price, priceCurrency: "MAD" });
+      offers.push({ name: o.label + " — " + trip.title, price: o.price, priceCurrency: "MAD" });
     });
   } else if (p.type === "driver-passenger") {
     offers.push(
-      { "@type": "Offer", name: "Driver", price: p.driverPrice, priceCurrency: "MAD" },
-      { "@type": "Offer", name: "Passenger", price: p.passengerPrice, priceCurrency: "MAD" }
+      { name: "Driver — " + trip.title, price: p.driverPrice, priceCurrency: "MAD" },
+      { name: "Passenger — " + trip.title, price: p.passengerPrice, priceCurrency: "MAD" }
     );
   }
+
+  var enrich = EM.SEO && EM.SEO.enrichOffers
+    ? EM.SEO.enrichOffers(offers, {
+        url: tripUrl,
+        description: trip.shortDescription || trip.description,
+        name: trip.title,
+      })
+    : offers;
+
+  var absImages = galleryImages.map(function (src) {
+    if (!src) return EM.SEO && EM.SEO.defaultImage ? EM.SEO.defaultImage() : trip.image;
+    if (/^https?:\/\//i.test(src)) return src;
+    var base = ((EM.config && EM.config.siteUrl) || "https://excursionmarrakech.net").replace(/\/$/, "");
+    return base + (src.charAt(0) === "/" ? src : "/" + src);
+  });
 
   var schema = {
     "@context": "https://schema.org",
     "@type": ["Product", "TouristTrip"],
     name: trip.title,
-    description: trip.shortDescription,
-    image: galleryImages.length > 1 ? galleryImages : galleryImages[0] || trip.image,
+    description: trip.shortDescription || trip.description || trip.title,
+    image: absImages.length ? absImages : absImages[0] || trip.image,
     brand: { "@type": "Brand", name: "excursionmarrakech" },
+    sku: trip.id,
     touristType: EM.categoryName(trip.category),
     aggregateRating: {
       "@type": "AggregateRating",
@@ -566,18 +585,83 @@ document.addEventListener("DOMContentLoaded", async function () {
       worstRating: 1,
     },
     offers:
-      offers.length === 1
-        ? offers[0]
+      enrich.length === 1
+        ? enrich[0]
         : {
             "@type": "AggregateOffer",
             priceCurrency: "MAD",
             lowPrice: EM.startingPrice(trip),
-            offerCount: offers.length,
-            offers: offers,
+            highPrice: Math.max.apply(
+              null,
+              enrich.map(function (o) {
+                return Number(o.price) || 0;
+              })
+            ),
+            offerCount: enrich.length,
+            offers: enrich,
           },
   };
-  var script = document.createElement("script");
-  script.type = "application/ld+json";
-  script.textContent = JSON.stringify(schema);
-  document.head.appendChild(script);
+  if (EM.SEO && EM.SEO.injectJsonLd) EM.SEO.injectJsonLd("trip-product-schema", schema);
+  else {
+    var script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.id = "trip-product-schema";
+    script.textContent = JSON.stringify(schema);
+    document.head.appendChild(script);
+  }
+
+  // Trip FAQ + cancellation (visible + FAQPage schema)
+  var faqMount = document.getElementById("trip-faq");
+  if (faqMount) {
+    var faqs = [
+      {
+        q: EM.t ? EM.t("trip.faq1q") : "What is included in this Marrakech excursion?",
+        a: EM.t ? EM.t("trip.faq1a") : "Inclusions are listed on this page. Private and Group options show clear MAD pricing before you inquire.",
+      },
+      {
+        q: EM.t ? EM.t("trip.faq2q") : "How do I book?",
+        a: EM.t ? EM.t("trip.faq2a") : "Send a booking request with your date and party size, or WhatsApp +212 639 996 960. We confirm availability personally.",
+      },
+      {
+        q: EM.t ? EM.t("trip.faq3q") : "What is the cancellation policy?",
+        a: EM.t ? EM.t("trip.faq3a") : "Free cancellation up to 48 hours before the activity. Within 48 hours, fees may apply as confirmed at booking. Weather or safety issues are rescheduled when possible.",
+      },
+      {
+        q: EM.t ? EM.t("trip.faq4q") : "Is hotel pickup included?",
+        a: EM.t ? EM.t("trip.faq4a") : "Most day trips and desert tours include pickup in Marrakech when stated in the inclusions. Confirm your hotel or riad address when you book.",
+      },
+    ];
+    faqMount.innerHTML =
+      '<span class="eyebrow">' +
+      EM.escapeHtml(EM.t ? EM.t("trip.faqEyebrow") : "FAQ") +
+      "</span>" +
+      "<h2 id=\"trip-faq-heading\">" +
+      EM.escapeHtml(EM.t ? EM.t("trip.faqTitle") : "Questions before you book") +
+      "</h2>" +
+      '<div class="transfer-faq__list">' +
+      faqs
+        .map(function (f, i) {
+          return (
+            "<details" +
+            (i === 0 ? " open" : "") +
+            "><summary>" +
+            EM.escapeHtml(f.q) +
+            "</summary><p>" +
+            EM.escapeHtml(f.a) +
+            "</p></details>"
+          );
+        })
+        .join("") +
+      "</div>";
+    if (EM.SEO && EM.SEO.injectFaqPage) EM.SEO.injectFaqPage(faqs, "trip-faq-schema");
+  }
+
+  if (EM.SEO && EM.SEO.applyPageMeta) {
+    EM.SEO.applyPageMeta("trip", {
+      title: trip.title + " | excursionmarrakech",
+      description: (trip.shortDescription || trip.description || trip.title) + " WhatsApp +212 639 996 960.",
+      image: absImages[0],
+      imageAlt: trip.title,
+    });
+  }
 });

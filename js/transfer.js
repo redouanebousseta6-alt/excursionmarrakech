@@ -68,6 +68,13 @@
     } catch (e) {
       return;
     }
+    data.description =
+      data.description ||
+      "Fixed-price private transfers from Marrakech Menara Airport with meet & greet, flight monitoring and VIP Mercedes options. WhatsApp +212 639 996 960.";
+    data.image =
+      data.image ||
+      ((EM.SEO && EM.SEO.defaultImage && EM.SEO.defaultImage()) ||
+        "https://excursionmarrakech.net/images/transfers/airport-transfer-hero.jpg");
     if (rating && rating.reviewCount > 0) {
       data.aggregateRating = {
         "@type": "AggregateRating",
@@ -94,6 +101,42 @@
         },
       };
     });
+
+    if (data.offers && EM.SEO && EM.SEO.enrichOffer) {
+      var offerUrl = "https://excursionmarrakech.net/airport-transfer";
+      if (data.offers["@type"] === "AggregateOffer" && Array.isArray(data.offers.offers)) {
+        data.offers.offers = data.offers.offers.map(function (o) {
+          return EM.SEO.enrichOffer(o, {
+            url: offerUrl,
+            description: data.description,
+            name: o.name || data.name,
+          });
+        });
+        data.offers.description = data.description;
+      } else {
+        data.offers = EM.SEO.enrichOffer(data.offers, {
+          url: offerUrl,
+          description: data.description,
+          name: data.name,
+        });
+      }
+    }
+
     el.textContent = JSON.stringify(data);
+
+    var faqs = [1, 2, 3, 4].map(function (n) {
+      return {
+        q: EM.t ? EM.t("transfer.faq" + n + "q") : "",
+        a: EM.t ? EM.t("transfer.faq" + n + "a") : "",
+      };
+    }).filter(function (f) {
+      return f.q && f.a;
+    });
+    faqs.push({
+      q: EM.t ? EM.t("trip.faq3q") : "What is the cancellation policy?",
+      a: EM.t ? EM.t("trip.faq3a") : "Free cancellation up to 48 hours before pickup.",
+    });
+    if (EM.SEO && EM.SEO.injectFaqPage) EM.SEO.injectFaqPage(faqs, "transfer-faq-schema");
+    if (EM.SEO && EM.SEO.applyPageMeta) EM.SEO.applyPageMeta("transfer");
   };
 })();

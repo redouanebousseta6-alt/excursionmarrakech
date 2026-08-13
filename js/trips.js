@@ -91,4 +91,5 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   EM.refreshTripsFilters();
+  if (EM.SEO && EM.SEO.applyPageMeta) EM.SEO.applyPageMeta("trips");
 });

@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     EM.initTracking && EM.initTracking(EM.config);
     EM.setActiveNav("about");
   }
+  if (EM.SEO && EM.SEO.applyPageMeta) EM.SEO.applyPageMeta("about");
 
   var items = Array.prototype.slice.call(document.querySelectorAll("[data-gallery-src]"));
   if (!items.length) return;
