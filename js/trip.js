@@ -568,19 +568,38 @@ document.addEventListener("DOMContentLoaded", async function () {
     return base + (src.charAt(0) === "/" ? src : "/" + src);
   });
 
+  // Product only for review stars — TouristTrip + reviews triggers GSC critical errors
+  var productReviews = (EM.REVIEWS || [])
+    .filter(function (r) {
+      return r.tripId === trip.id;
+    })
+    .map(function (r) {
+      return {
+        "@type": "Review",
+        author: { "@type": "Person", name: r.name },
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: Number(r.rating),
+          bestRating: 5,
+          worstRating: 1,
+        },
+        reviewBody: r.text,
+      };
+    });
+
   var schema = {
     "@context": "https://schema.org",
-    "@type": ["Product", "TouristTrip"],
+    "@type": "Product",
     name: trip.title,
     description: trip.shortDescription || trip.description || trip.title,
     image: absImages.length ? absImages : absImages[0] || trip.image,
     brand: { "@type": "Brand", name: "excursionmarrakech" },
     sku: trip.id,
-    touristType: EM.categoryName(trip.category),
+    category: EM.categoryName(trip.category),
     aggregateRating: {
       "@type": "AggregateRating",
-      ratingValue: rating.rating,
-      reviewCount: rating.reviewCount,
+      ratingValue: Number(rating.rating),
+      reviewCount: Number(rating.reviewCount),
       bestRating: 5,
       worstRating: 1,
     },
@@ -601,6 +620,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             offers: enrich,
           },
   };
+  if (productReviews.length) schema.review = productReviews;
+
   if (EM.SEO && EM.SEO.injectJsonLd) EM.SEO.injectJsonLd("trip-product-schema", schema);
   else {
     var script = document.createElement("script");
@@ -608,6 +629,24 @@ document.addEventListener("DOMContentLoaded", async function () {
     script.id = "trip-product-schema";
     script.textContent = JSON.stringify(schema);
     document.head.appendChild(script);
+  }
+
+  // Separate TouristTrip entity (no reviews) for trip semantics
+  if (EM.SEO && EM.SEO.injectJsonLd) {
+    EM.SEO.injectJsonLd("trip-tourist-schema", {
+      "@context": "https://schema.org",
+      "@type": "TouristTrip",
+      name: trip.title,
+      description: trip.shortDescription || trip.description || trip.title,
+      image: absImages[0] || trip.image,
+      touristType: EM.categoryName(trip.category),
+      url: tripUrl,
+      provider: {
+        "@type": "TravelAgency",
+        name: "excursionmarrakech",
+        url: (EM.config && EM.config.siteUrl) || "https://excursionmarrakech.net",
+      },
+    });
   }
 
   // Trip FAQ + cancellation (visible + FAQPage schema)

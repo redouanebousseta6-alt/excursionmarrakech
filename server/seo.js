@@ -147,18 +147,21 @@ function buildTripSchema(trip, { site = SITE, lowPrice } = {}) {
   );
   return {
     "@context": "https://schema.org",
-    "@type": ["Product", "TouristTrip"],
+    "@type": "Product",
     name: trip.title,
     description,
-    image: trip.image ? [trip.image.startsWith("http") ? trip.image : `${site.replace(/\/$/, "")}${trip.image}`] : [OG_IMAGE],
+    image: trip.image
+      ? [trip.image.startsWith("http") ? trip.image : `${site.replace(/\/$/, "")}${trip.image}`]
+      : [OG_IMAGE],
     brand: { "@type": "Brand", name: "excursionmarrakech" },
     sku: trip.id,
+    category: trip.category || undefined,
     aggregateRating:
       trip.rating != null
         ? {
             "@type": "AggregateRating",
-            ratingValue: trip.rating,
-            reviewCount: trip.reviewCount || 1,
+            ratingValue: Number(trip.rating),
+            reviewCount: Number(trip.reviewCount) || 1,
             bestRating: 5,
             worstRating: 1,
           }

@@ -104,7 +104,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     }).join("");
   }
 
-  // JSON-LD for Google rich results (TravelAgency + AggregateRating)
+  // TravelAgency entity only — Google does not allow review snippets on
+  // TravelAgency/Service (critical "Invalid object type"). Stars stay on Product pages.
   var schema = {
     "@context": "https://schema.org",
     "@type": "TravelAgency",
@@ -127,31 +128,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     },
     hasMerchantReturnPolicy:
       EM.SEO && EM.SEO.merchantReturnPolicy ? EM.SEO.merchantReturnPolicy() : undefined,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: agg.ratingValue,
-      reviewCount: agg.reviewCount,
-      bestRating: 5,
-      worstRating: 1,
-    },
-    review: (EM.REVIEWS || []).map(function (r) {
-      var t = EM.getTrip(r.tripId);
-      return {
-        "@type": "Review",
-        author: { "@type": "Person", name: r.name },
-        reviewRating: {
-          "@type": "Rating",
-          ratingValue: r.rating,
-          bestRating: 5,
-          worstRating: 1,
-        },
-        reviewBody: r.text,
-        itemReviewed: {
-          "@type": "TouristTrip",
-          name: t ? t.title : "Marrakech excursion",
-        },
-      };
-    }),
   };
   if (EM.SEO && EM.SEO.injectJsonLd) EM.SEO.injectJsonLd("home-org-schema", schema);
   else {

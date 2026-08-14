@@ -68,6 +68,11 @@
     } catch (e) {
       return;
     }
+    // Product (not Service) — Google only allows review snippets on Product etc.
+    data["@type"] = "Product";
+    data.name = data.name || "Marrakech Airport Private Transfer";
+    data.sku = data.sku || "airport-transfer";
+    data.brand = data.brand || { "@type": "Brand", name: "excursionmarrakech" };
     data.description =
       data.description ||
       "Fixed-price private transfers from Marrakech Menara Airport with meet & greet, flight monitoring and VIP Mercedes options. WhatsApp +212 639 996 960.";
@@ -75,32 +80,35 @@
       data.image ||
       ((EM.SEO && EM.SEO.defaultImage && EM.SEO.defaultImage()) ||
         "https://excursionmarrakech.net/images/transfers/airport-transfer-hero.jpg");
+    delete data.serviceType;
+    delete data.provider;
+    delete data.areaServed;
     if (rating && rating.reviewCount > 0) {
       data.aggregateRating = {
         "@type": "AggregateRating",
-        ratingValue: rating.rating,
-        reviewCount: rating.reviewCount,
+        ratingValue: Number(rating.rating),
+        reviewCount: Number(rating.reviewCount),
         bestRating: 5,
         worstRating: 1,
       };
+      // Nested under Product — omit itemReviewed (parent is the reviewed item)
+      data.review = (EM.TRANSFER_REVIEWS || []).map(function (r) {
+        return {
+          "@type": "Review",
+          author: { "@type": "Person", name: r.name },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: Number(r.rating),
+            bestRating: 5,
+            worstRating: 1,
+          },
+          reviewBody: r.text,
+        };
+      });
+    } else {
+      delete data.aggregateRating;
+      delete data.review;
     }
-    data.review = (EM.TRANSFER_REVIEWS || []).map(function (r) {
-      return {
-        "@type": "Review",
-        author: { "@type": "Person", name: r.name },
-        reviewRating: {
-          "@type": "Rating",
-          ratingValue: r.rating,
-          bestRating: 5,
-          worstRating: 1,
-        },
-        reviewBody: r.text,
-        itemReviewed: {
-          "@type": "Service",
-          name: "Marrakech Airport Private Transfer",
-        },
-      };
-    });
 
     if (data.offers && EM.SEO && EM.SEO.enrichOffer) {
       var offerUrl = "https://excursionmarrakech.net/airport-transfer";
