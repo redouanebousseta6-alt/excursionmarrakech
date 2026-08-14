@@ -10,6 +10,8 @@
   var CONSENT_KEY = "em_tracking_consent";
   /** Fallback when production .env is missing GA_MEASUREMENT_ID */
   var FALLBACK_GA_ID = "G-3JSSYBLXW5";
+  /** Fallback when production .env is missing GOOGLE_ADS_ID */
+  var FALLBACK_ADS_ID = "AW-760950068";
 
   function getConsent() {
     try {
@@ -38,6 +40,10 @@
 
   function resolveGaId(config) {
     return (config && config.googleAnalyticsId) || FALLBACK_GA_ID || "";
+  }
+
+  function resolveAdsId(config) {
+    return (config && config.googleAdsId) || FALLBACK_ADS_ID || "";
   }
 
   function loadGtagScript(gaId) {
@@ -86,7 +92,7 @@
   function injectGoogleTags(config, opts) {
     opts = opts || {};
     var gaId = resolveGaId(config);
-    var adsId = (config && config.googleAdsId) || "";
+    var adsId = resolveAdsId(config);
     if (!gaId && !adsId) return;
 
     ensureDataLayer();
@@ -209,11 +215,17 @@
     denyConsentDefaults();
 
     var gaId = resolveGaId(config);
-    var hasMarketing = !!(gaId || config.googleAdsId || config.metaPixelId);
+    var adsId = resolveAdsId(config);
+    // Keep resolved IDs on EM.config so conversion events use the same Ads tag.
+    if (EM.config) {
+      if (!EM.config.googleAnalyticsId) EM.config.googleAnalyticsId = gaId;
+      if (!EM.config.googleAdsId) EM.config.googleAdsId = adsId;
+    }
+    var hasMarketing = !!(gaId || adsId || config.metaPixelId);
 
     // Always register the Google tag (so GA can detect it), but keep storage denied
     // until the visitor accepts cookies.
-    if (gaId || config.googleAdsId) {
+    if (gaId || adsId) {
       injectGoogleTags(config, { grantConsent: false });
     }
 
@@ -266,7 +278,7 @@
       window.gtag("event", name, gaParams);
     }
 
-    var adsId = EM.config && EM.config.googleAdsId;
+    var adsId = resolveAdsId(EM.config);
     var label = EM.config && EM.config.googleAdsConversionLabel;
     if (
       adsId &&
