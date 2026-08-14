@@ -132,20 +132,23 @@
           document.getElementById("status").textContent = b.status;
 
           if (b.status === "paid") {
+            document.title = "Payment received | excursionmarrakech";
             document.getElementById("success-title").textContent = "Payment received";
             document.getElementById("success-body").textContent =
-              "Thank you! Your payment was successful. We’ll email confirmation and trip details shortly.";
+              "Thank you! Your payment was successful. A confirmation email is on its way with your trip details.";
             EM.trackEvent("Purchase", {
               value: b.totalAmount,
               currency: "MAD",
               content_name: b.tripTitle,
             });
           } else if (b.status === "inquiry") {
+            document.title = "Inquiry received | excursionmarrakech";
             document.getElementById("success-title").textContent = "Inquiry received";
             document.getElementById("success-body").textContent =
-              "Thanks! Our team will confirm availability and get back to you soon.";
+              "Thanks! We emailed you a copy of this inquiry. Our team will confirm availability and get back to you soon.";
             EM.trackEvent("Lead");
           } else {
+            document.title = "Booking update | excursionmarrakech";
             document.getElementById("success-body").textContent =
               "Your booking is being processed. Status: " + b.status;
           }

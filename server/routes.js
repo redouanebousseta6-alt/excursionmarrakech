@@ -1,10 +1,11 @@
 const express = require("express");
-const { v4: uuidv4 } = require("uuid");
 const { db, rowToTrip, tripToRow } = require("./db");
 const { requireAdmin, loginAdmin } = require("./auth");
 const { CATEGORIES, startingPrice, computeTotal } = require("./pricing");
 const { DEFAULT_RATES } = require("../js/currency.js");
 const { uploadTripImage } = require("./upload");
+const { createBookingId } = require("./ids");
+const { notifyBookingCreated } = require("./mail");
 
 const router = express.Router();
 
@@ -138,7 +139,7 @@ router.post("/bookings", (req, res) => {
     : "MAD";
   const displayTotal = convertFromMad(priced.total, currencyCode, rates);
 
-  const id = uuidv4();
+  const id = createBookingId();
   const status = mode === "payment" ? "pending_payment" : "inquiry";
   const phoneClean = String(phone).trim();
 
@@ -165,6 +166,12 @@ router.post("/bookings", (req, res) => {
     displayTotal,
     status
   );
+
+  const bookingRow = db.prepare("SELECT * FROM bookings WHERE id = ?").get(id);
+  // Fire-and-forget emails (guest + admin)
+  notifyBookingCreated(bookingRow).catch((err) => {
+    console.error("[mail] notify failed:", err.message);
+  });
 
   console.log(
     `[booking] ${status} ${id} · ${trip.title} · ${fullName} · ${phoneClean} · ${priced.total} MAD (${displayTotal} ${currencyCode})`
