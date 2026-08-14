@@ -140,6 +140,8 @@
               value: b.totalAmount,
               currency: "MAD",
               content_name: b.tripTitle,
+              transaction_id: b.id,
+              bookingId: b.id,
             });
           } else if (b.status === "inquiry") {
             document.title = "Inquiry received | excursionmarrakech";

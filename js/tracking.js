@@ -12,6 +12,8 @@
   var FALLBACK_GA_ID = "G-3JSSYBLXW5";
   /** Fallback when production .env is missing GOOGLE_ADS_ID */
   var FALLBACK_ADS_ID = "AW-760950068";
+  /** Purchase conversion label from Google Ads (AW-…/LABEL) */
+  var FALLBACK_ADS_CONVERSION_LABEL = "JcIzCMjR9dIBELTa7OoC";
 
   function getConsent() {
     try {
@@ -44,6 +46,10 @@
 
   function resolveAdsId(config) {
     return (config && config.googleAdsId) || FALLBACK_ADS_ID || "";
+  }
+
+  function resolveAdsConversionLabel(config) {
+    return (config && config.googleAdsConversionLabel) || FALLBACK_ADS_CONVERSION_LABEL || "";
   }
 
   function loadGtagScript(gaId) {
@@ -216,10 +222,12 @@
 
     var gaId = resolveGaId(config);
     var adsId = resolveAdsId(config);
+    var adsLabel = resolveAdsConversionLabel(config);
     // Keep resolved IDs on EM.config so conversion events use the same Ads tag.
     if (EM.config) {
       if (!EM.config.googleAnalyticsId) EM.config.googleAnalyticsId = gaId;
       if (!EM.config.googleAdsId) EM.config.googleAdsId = adsId;
+      if (!EM.config.googleAdsConversionLabel) EM.config.googleAdsConversionLabel = adsLabel;
     }
     var hasMarketing = !!(gaId || adsId || config.metaPixelId);
 
@@ -279,19 +287,17 @@
     }
 
     var adsId = resolveAdsId(EM.config);
-    var label = EM.config && EM.config.googleAdsConversionLabel;
+    var label = resolveAdsConversionLabel(EM.config);
     if (
       adsId &&
       label &&
-      (name === "Lead" ||
-        name === "generate_lead" ||
-        name === "Purchase" ||
-        name === "purchase")
+      (name === "Purchase" || name === "purchase")
     ) {
       window.gtag("event", "conversion", {
         send_to: adsId + "/" + label,
-        value: params.value || 1,
+        value: params.value || 0,
         currency: params.currency || "MAD",
+        transaction_id: params.transaction_id || params.bookingId || "",
       });
     }
   };
