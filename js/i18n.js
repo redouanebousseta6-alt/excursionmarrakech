@@ -104,8 +104,12 @@
   };
 
   function escHtml(s) {
-    if (EM.escapeHtml) return escHtml(s);
-    return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    if (EM.escapeHtml) return EM.escapeHtml(s);
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
 
   EM.updatePrefsLabel = function () {
