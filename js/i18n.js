@@ -119,6 +119,81 @@
     label.textContent = lang;
   };
 
+  EM.setLang = function (lang, opts) {
+    opts = opts || {};
+    lang = normalizeLang(lang) || "en";
+    EM.lang = lang;
+    try {
+      localStorage.setItem(LANG_KEY, lang);
+    } catch (e) {}
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    document.documentElement.classList.toggle("is-rtl", lang === "ar");
+
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var key = el.getAttribute("data-i18n");
+      var val = EM.t(key);
+      if (el.hasAttribute("data-i18n-html")) el.innerHTML = val;
+      else el.textContent = val;
+    });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(function (el) {
+      el.placeholder = EM.t(el.getAttribute("data-i18n-placeholder"));
+    });
+    document.querySelectorAll("[data-i18n-aria]").forEach(function (el) {
+      el.setAttribute("aria-label", EM.t(el.getAttribute("data-i18n-aria")));
+    });
+
+    if (typeof EM.renderTransferReviews === "function") EM.renderTransferReviews();
+
+    var select = document.querySelector("[data-lang]");
+    if (select && select.value !== lang) select.value = lang;
+
+    EM.updatePrefsLabel();
+    EM.injectHreflang();
+
+    if (opts.reloadGrids !== false) refreshPriceGrids();
+
+    if (opts.reloadTrip && EM._currentTrip && typeof EM.applyTripI18n === "function") {
+      EM.applyTripI18n(EM._currentTrip);
+    }
+
+    if (EM.SEO && EM.SEO.applyPageMeta && EM.SEO.PAGE_KEYS) {
+      var pageKey = EM.SEO.PAGE_KEYS[window.location.pathname];
+      if (pageKey) EM.SEO.applyPageMeta(pageKey);
+    }
+
+    if (opts.pushUrl !== false) {
+      var url = new URL(window.location.href);
+      if (lang === "en") url.searchParams.delete("lang");
+      else url.searchParams.set("lang", lang);
+      window.history.replaceState({}, "", url);
+    }
+  };
+
+  EM.injectHreflang = function () {
+    document.querySelectorAll('link[rel="alternate"][hreflang]').forEach(function (n) {
+      n.remove();
+    });
+    var site = (EM.config && EM.config.siteUrl) || "https://excursionmarrakech.net";
+    var path = window.location.pathname;
+    SUPPORTED.forEach(function (code) {
+      var link = document.createElement("link");
+      link.rel = "alternate";
+      link.hreflang = code;
+      link.setAttribute("data-em-hreflang", "1");
+      var href = site.replace(/\/$/, "") + path;
+      if (code !== "en") href += (href.indexOf("?") === -1 ? "?" : "&") + "lang=" + code;
+      link.href = href;
+      document.head.appendChild(link);
+    });
+    var xdef = document.createElement("link");
+    xdef.rel = "alternate";
+    xdef.hreflang = "x-default";
+    xdef.setAttribute("data-em-hreflang", "1");
+    xdef.href = site.replace(/\/$/, "") + path;
+    document.head.appendChild(xdef);
+  };
+
   EM.mountPrefsMenu = function () {
     var nav = document.querySelector("[data-nav]");
     if (!nav) return;
