@@ -161,15 +161,16 @@
   EM.renderTripGrid = function (container, trips, options) {
     if (!container) return;
     options = options || {};
+    trips = trips || [];
+    if (options.transferOnly) {
+      container.innerHTML = EM.airportTransferCardHtml();
+      return;
+    }
     var html = "";
     if (options.includeTransfer) html += EM.airportTransferCardHtml();
     if (!trips.length && !options.includeTransfer) {
       container.innerHTML =
         '<div class="empty-state"><p>No trips match this filter. Try another category.</p></div>';
-      return;
-    }
-    if (options.transferOnly) {
-      container.innerHTML = EM.airportTransferCardHtml();
       return;
     }
     html += trips.map(EM.tripCardHtml).join("");
