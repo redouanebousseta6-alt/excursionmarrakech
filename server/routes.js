@@ -87,6 +87,71 @@ router.get("/trips/:id", (req, res) => {
   res.json(rowToTrip(row));
 });
 
+router.get("/search", (req, res) => {
+  const q = String(req.query.q || "").trim().toLowerCase();
+  const tokens = q.split(/[\s,+/]+/).filter((t) => t.length > 1);
+  const all = db
+    .prepare("SELECT * FROM trips WHERE active = 1 ORDER BY featured DESC, title ASC")
+    .all()
+    .map(rowToTrip);
+
+  if (!q) {
+    return res.json({
+      query: "",
+      results: all.filter((t) => t.featured).slice(0, 8),
+      includeTransfer: false,
+      suggestions: [
+        "Ourika",
+        "Agafay",
+        "Merzouga",
+        "Ouzoud",
+        "Essaouira",
+        "airport transfer",
+        "Hammam",
+        "quad",
+      ],
+    });
+  }
+
+  const transferHit =
+    /airport|transfer|transfert|menara|a[eé]roport|taxi|pickup|chauffeur|rak\b/.test(q);
+
+  const scored = all
+    .map((trip) => {
+      const hay = [
+        trip.title,
+        trip.shortDescription,
+        trip.description,
+        trip.id,
+        trip.category,
+        trip.duration,
+        ...(trip.tags || []),
+        ...(trip.itinerary || []),
+        ...(trip.included || []),
+      ]
+        .join(" ")
+        .toLowerCase();
+      let score = 0;
+      (tokens.length ? tokens : [q]).forEach((tok) => {
+        if (String(trip.title).toLowerCase().includes(tok)) score += 10;
+        if (String(trip.id).includes(tok)) score += 8;
+        if (hay.includes(tok)) score += 3;
+      });
+      if (trip.featured) score += 0.5;
+      return { trip, score };
+    })
+    .filter((r) => r.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map((r) => r.trip);
+
+  res.json({
+    query: String(req.query.q || "").trim(),
+    results: scored,
+    includeTransfer: transferHit,
+    count: scored.length + (transferHit ? 1 : 0),
+  });
+});
+
 router.post("/bookings", (req, res) => {
   const {
     tripId,

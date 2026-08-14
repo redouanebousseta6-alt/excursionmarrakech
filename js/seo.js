@@ -188,5 +188,6 @@
     "/trips": "trips",
     "/about": "about",
     "/airport-transfer": "transfer",
+    "/search": "search",
   };
 })();

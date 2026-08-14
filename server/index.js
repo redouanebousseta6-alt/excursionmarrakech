@@ -16,7 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const root = path.join(__dirname, "..");
 /** Bump on frontend deploys so browsers skip stale CSS/JS (7d cache). */
-const ASSET_VERSION = process.env.ASSET_VERSION || "20260814b";
+const ASSET_VERSION = process.env.ASSET_VERSION || "20260814c";
 
 const PAGE_FILES = {
   trips: "trips.html",
@@ -26,6 +26,7 @@ const PAGE_FILES = {
   "terms-conditions": "terms-conditions.html",
   "booking-success": "booking-success.html",
   "airport-transfer": "airport-transfer.html",
+  search: "search.html",
 };
 
 const RESERVED_SLUGS = new Set([
@@ -107,6 +108,7 @@ app.get("/sitemap.xml", (_req, res) => {
   const staticPages = [
     "",
     "/trips",
+    "/search",
     "/about",
     "/airport-transfer",
     "/privacy",
@@ -117,7 +119,11 @@ app.get("/sitemap.xml", (_req, res) => {
     .map(
       (p) =>
         `  <url><loc>${site}${p || "/"}</loc><changefreq>weekly</changefreq><priority>${
-          p === "" ? "1.0" : p === "/airport-transfer" || p === "/trips" ? "0.9" : "0.8"
+          p === ""
+            ? "1.0"
+            : p === "/airport-transfer" || p === "/trips" || p === "/search"
+              ? "0.9"
+              : "0.8"
         }</priority></url>`
     )
     .join("\n");

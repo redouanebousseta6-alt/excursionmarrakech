@@ -1059,6 +1059,93 @@ EM.getByCategory = function (categoryId) {
   });
 };
 
+/** Popular search suggestions (SEO + empty-state UX) */
+EM.SEARCH_SUGGESTIONS = [
+  { q: "Ourika", label: "Ourika Valley" },
+  { q: "Agafay", label: "Agafay Desert" },
+  { q: "Merzouga", label: "Merzouga Sahara" },
+  { q: "Ouzoud", label: "Ouzoud Waterfalls" },
+  { q: "Essaouira", label: "Essaouira" },
+  { q: "airport transfer", label: "Airport transfer" },
+  { q: "Hammam", label: "Hammam & spa" },
+  { q: "quad", label: "Quad / buggy" },
+];
+
+/**
+ * Full-text style trip search for /search?q=
+ * Returns ranked trips + whether airport transfer should appear.
+ */
+EM.searchTrips = function (query) {
+  var raw = String(query || "").trim();
+  var q = raw.toLowerCase();
+  if (!q) {
+    return { query: "", trips: [], includeTransfer: false, suggestions: EM.SEARCH_SUGGESTIONS };
+  }
+
+  var tokens = q.split(/[\s,+/]+/).filter(function (t) {
+    return t.length > 1;
+  });
+  if (!tokens.length) tokens = [q];
+
+  var transferHit =
+    /airport|transfer|transfert|menara|a[eé]roport|taxi|pickup|chauffeur|rak\b/.test(q);
+
+  function haystack(trip) {
+    var loc = EM.localizedTrip ? EM.localizedTrip(trip) : trip;
+    var cat = EM.categoryLabel
+      ? EM.categoryLabel(trip.category)
+      : EM.categoryName
+        ? EM.categoryName(trip.category)
+        : trip.category;
+    return [
+      loc.title,
+      loc.shortDescription,
+      loc.description,
+      trip.id,
+      trip.category,
+      cat,
+      loc.duration,
+      loc.durationLabel,
+      (trip.tags || []).join(" "),
+      (loc.itinerary || []).join(" "),
+      (loc.included || []).join(" "),
+    ]
+      .join(" ")
+      .toLowerCase();
+  }
+
+  var ranked = (EM.TRIPS || [])
+    .map(function (trip) {
+      var hay = haystack(trip);
+      var loc = EM.localizedTrip ? EM.localizedTrip(trip) : trip;
+      var title = String(loc.title || "").toLowerCase();
+      var score = 0;
+      tokens.forEach(function (tok) {
+        if (title.indexOf(tok) !== -1) score += 10;
+        if (String(trip.id).indexOf(tok) !== -1) score += 8;
+        if (hay.indexOf(tok) !== -1) score += 3;
+      });
+      if (trip.featured) score += 0.5;
+      return { trip: trip, score: score };
+    })
+    .filter(function (row) {
+      return row.score > 0;
+    })
+    .sort(function (a, b) {
+      return b.score - a.score;
+    })
+    .map(function (row) {
+      return row.trip;
+    });
+
+  return {
+    query: raw,
+    trips: ranked,
+    includeTransfer: transferHit,
+    suggestions: EM.SEARCH_SUGGESTIONS,
+  };
+};
+
 /** Related trips for a listing page: same category first, then featured/top-rated. */
 EM.getRelatedTrips = function (trip, limit) {
   limit = limit || 4;

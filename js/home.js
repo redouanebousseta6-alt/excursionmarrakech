@@ -136,5 +136,28 @@ document.addEventListener("DOMContentLoaded", async function () {
     script.textContent = JSON.stringify(schema);
     document.head.appendChild(script);
   }
+
+  // Sitelinks search box for Google
+  var siteUrl = ((EM.config && EM.config.siteUrl) || "https://excursionmarrakech.net").replace(
+    /\/$/,
+    ""
+  );
+  if (EM.SEO && EM.SEO.injectJsonLd) {
+    EM.SEO.injectJsonLd("website-search-schema", {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "excursionmarrakech",
+      url: siteUrl + "/",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: siteUrl + "/search?q={search_term_string}",
+        },
+        "query-input": "required name=search_term_string",
+      },
+    });
+  }
+
   if (EM.SEO && EM.SEO.applyPageMeta) EM.SEO.applyPageMeta("home");
 });

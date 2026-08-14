@@ -130,6 +130,18 @@ const PAGE_SEO = {
         "Transferts privés à prix fixe depuis l’aéroport Menara vers médina, côte et longues distances. Mercedes VIP. WhatsApp +212 639 996 960.",
     },
   },
+  search: {
+    en: {
+      title: "Search Marrakech excursions | excursionmarrakech",
+      description:
+        "Search Marrakech excursions: Agafay desert, Ourika, Ouzoud, Merzouga, hammam and airport transfers. Clear Private/Group pricing.",
+    },
+    fr: {
+      title: "Rechercher des excursions à Marrakech | excursionmarrakech",
+      description:
+        "Recherchez des excursions à Marrakech : désert Agafay, Ourika, Ouzoud, Merzouga, hammam et transfert aéroport. Tarifs clairs.",
+    },
+  },
 };
 
 const LANGS = ["en", "fr", "de", "es", "ar"];
@@ -179,6 +191,8 @@ function withCrawlerSeo(html, { path = "/", lang = "en" } = {}) {
         ? "transfer"
         : path.includes("trips")
           ? "trips"
+      : path.includes("search")
+          ? "search"
           : path.includes("about")
             ? "about"
             : null;
