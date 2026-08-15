@@ -463,7 +463,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     try {
       var booking = await createBooking("inquiry");
       if (!booking || !booking.bookingId) throw new Error("Booking was not saved");
-      EM.trackEvent("Lead", { content_name: trip.title });
+      EM.trackEvent("Lead", {
+        content_name: trip.title,
+        bookingId: booking.bookingId,
+      });
       window.location.href =
         "/booking-success?bookingId=" + encodeURIComponent(booking.bookingId);
     } catch (err) {

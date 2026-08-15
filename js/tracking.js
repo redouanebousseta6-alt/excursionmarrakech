@@ -13,7 +13,9 @@
   /** Fallback when production .env is missing GOOGLE_ADS_ID */
   var FALLBACK_ADS_ID = "AW-760950068";
   /** Purchase conversion label from Google Ads (AW-…/LABEL) */
-  var FALLBACK_ADS_CONVERSION_LABEL = "JcIzCMjR9dIBELTa7OoC";
+  var FALLBACK_ADS_PURCHASE_LABEL = "JcIzCMjR9dIBELTa7OoC";
+  /** Submit lead form conversion label from Google Ads */
+  var FALLBACK_ADS_LEAD_LABEL = "wXz8CJffgOIcELTa7OoC";
 
   function getConsent() {
     try {
@@ -48,8 +50,12 @@
     return (config && config.googleAdsId) || FALLBACK_ADS_ID || "";
   }
 
-  function resolveAdsConversionLabel(config) {
-    return (config && config.googleAdsConversionLabel) || FALLBACK_ADS_CONVERSION_LABEL || "";
+  function resolveAdsPurchaseLabel(config) {
+    return (config && config.googleAdsConversionLabel) || FALLBACK_ADS_PURCHASE_LABEL || "";
+  }
+
+  function resolveAdsLeadLabel(config) {
+    return (config && config.googleAdsLeadConversionLabel) || FALLBACK_ADS_LEAD_LABEL || "";
   }
 
   function loadGtagScript(gaId) {
@@ -222,12 +228,14 @@
 
     var gaId = resolveGaId(config);
     var adsId = resolveAdsId(config);
-    var adsLabel = resolveAdsConversionLabel(config);
+    var purchaseLabel = resolveAdsPurchaseLabel(config);
+    var leadLabel = resolveAdsLeadLabel(config);
     // Keep resolved IDs on EM.config so conversion events use the same Ads tag.
     if (EM.config) {
       if (!EM.config.googleAnalyticsId) EM.config.googleAnalyticsId = gaId;
       if (!EM.config.googleAdsId) EM.config.googleAdsId = adsId;
-      if (!EM.config.googleAdsConversionLabel) EM.config.googleAdsConversionLabel = adsLabel;
+      if (!EM.config.googleAdsConversionLabel) EM.config.googleAdsConversionLabel = purchaseLabel;
+      if (!EM.config.googleAdsLeadConversionLabel) EM.config.googleAdsLeadConversionLabel = leadLabel;
     }
     var hasMarketing = !!(gaId || adsId || config.metaPixelId);
 
@@ -287,18 +295,35 @@
     }
 
     var adsId = resolveAdsId(EM.config);
-    var label = resolveAdsConversionLabel(EM.config);
-    if (
-      adsId &&
-      label &&
-      (name === "Purchase" || name === "purchase")
-    ) {
-      window.gtag("event", "conversion", {
-        send_to: adsId + "/" + label,
-        value: params.value || 0,
-        currency: params.currency || "MAD",
-        transaction_id: params.transaction_id || params.bookingId || "",
-      });
+    var purchaseLabel = resolveAdsPurchaseLabel(EM.config);
+    var leadLabel = resolveAdsLeadLabel(EM.config);
+    var bookingKey = params.transaction_id || params.bookingId || "";
+
+    function fireAdsConversion(label, extra) {
+      if (!adsId || !label) return;
+      var dedupeKey = "em_ads_conv_" + label + "_" + (bookingKey || name);
+      try {
+        if (bookingKey && sessionStorage.getItem(dedupeKey)) return;
+        if (bookingKey) sessionStorage.setItem(dedupeKey, "1");
+      } catch (e) {
+        /* ignore */
+      }
+      var payload = Object.assign(
+        {
+          send_to: adsId + "/" + label,
+          value: params.value || 0,
+          currency: params.currency || "MAD",
+        },
+        extra || {}
+      );
+      if (bookingKey) payload.transaction_id = bookingKey;
+      window.gtag("event", "conversion", payload);
+    }
+
+    if (name === "Purchase" || name === "purchase") {
+      fireAdsConversion(purchaseLabel);
+    } else if (name === "Lead" || name === "generate_lead") {
+      fireAdsConversion(leadLabel);
     }
   };
 })();

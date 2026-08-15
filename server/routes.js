@@ -57,6 +57,7 @@ router.get("/config", (_req, res) => {
     metaPixelId: process.env.META_PIXEL_ID || "",
     googleAdsId: process.env.GOOGLE_ADS_ID || "",
     googleAdsConversionLabel: process.env.GOOGLE_ADS_CONVERSION_LABEL || "",
+    googleAdsLeadConversionLabel: process.env.GOOGLE_ADS_LEAD_CONVERSION_LABEL || "",
     googleAnalyticsId: process.env.GA_MEASUREMENT_ID || "",
     googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION || "",
     currencies: ["MAD", "USD", "EUR", "GBP"],

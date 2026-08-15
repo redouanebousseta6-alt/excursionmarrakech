@@ -148,7 +148,10 @@
             document.getElementById("success-title").textContent = "Inquiry received";
             document.getElementById("success-body").textContent =
               "Thanks! We emailed you a copy of this inquiry. Our team will confirm availability and get back to you soon.";
-            EM.trackEvent("Lead");
+            EM.trackEvent("Lead", {
+              content_name: b.tripTitle,
+              bookingId: b.id,
+            });
           } else {
             document.title = "Booking update | excursionmarrakech";
             document.getElementById("success-body").textContent =

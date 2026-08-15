@@ -16,7 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const root = path.join(__dirname, "..");
 /** Bump on frontend deploys so browsers skip stale CSS/JS (7d cache). */
-const ASSET_VERSION = process.env.ASSET_VERSION || "20260814f";
+const ASSET_VERSION = process.env.ASSET_VERSION || "20260815a";
 
 const PAGE_FILES = {
   trips: "trips.html",
