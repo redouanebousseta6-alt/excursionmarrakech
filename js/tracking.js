@@ -110,7 +110,8 @@
     ensureDataLayer();
 
     function apply() {
-      loadGtagScript(gaId || adsId);
+      // Prefer Ads ID in the script URL so Google Ads tag diagnosis detects AW-…
+      loadGtagScript(adsId || gaId);
       window.gtag("js", new Date());
       if (opts.grantConsent) setConsentGranted();
       if (gaId) {
@@ -127,8 +128,8 @@
       }
     }
 
-    // Defer network load so LCP/FCP are not competing with Analytics.
-    if (opts.immediate) apply();
+    // Ads config must load immediately for tag verification; only defer page_view work.
+    if (opts.immediate || adsId) apply();
     else afterLoad(apply);
   }
 
@@ -308,6 +309,10 @@
       } catch (e) {
         /* ignore */
       }
+      // Thank-you conversions need ad_storage granted or Google won't verify/count.
+      if (consent === "granted") setConsentGranted();
+      ensureDataLayer();
+      loadGtagScript(adsId);
       var payload = Object.assign(
         {
           send_to: adsId + "/" + label,

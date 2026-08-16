@@ -80,10 +80,20 @@
         const token = params.get("token"); // PayPal may return token=ORDER_ID
 
         await EM.loadConfig();
-        if (EM.initI18n) EM.initI18n();
-        // Conversion pages: grant analytics for this thank-you hit if user already consented,
-        // otherwise still init banner / tags per policy.
+        try {
+          if (EM.initI18n) EM.initI18n();
+        } catch (e) {
+          console.warn("i18n init failed", e);
+        }
+        // Load Ads/GA tags immediately on the thank-you page so conversions can verify.
         EM.initTracking(EM.config);
+        if (EM.config) {
+          EM.config.googleAdsId = EM.config.googleAdsId || "AW-760950068";
+          EM.config.googleAdsLeadConversionLabel =
+            EM.config.googleAdsLeadConversionLabel || "wXz8CJffgOIcELTa7OoC";
+          EM.config.googleAdsConversionLabel =
+            EM.config.googleAdsConversionLabel || "JcIzCMjR9dIBELTa7OoC";
+        }
 
         if (provider === "paypal" && (token || params.get("orderId"))) {
           try {

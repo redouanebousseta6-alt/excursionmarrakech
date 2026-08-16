@@ -16,7 +16,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const root = path.join(__dirname, "..");
 /** Bump on frontend deploys so browsers skip stale CSS/JS (7d cache). */
-const ASSET_VERSION = process.env.ASSET_VERSION || "20260815a";
+const ASSET_VERSION = process.env.ASSET_VERSION || "20260816a";
+const GOOGLE_ADS_ID = process.env.GOOGLE_ADS_ID || "AW-760950068";
 
 const PAGE_FILES = {
   trips: "trips.html",
@@ -70,6 +71,34 @@ function withSeoIcons(html) {
   return html.replace(/<\/head>/i, `    ${links}\n  </head>`);
 }
 
+/**
+ * Embed Google Ads base tag in HTML so Ads can detect/verify it
+ * (dynamic JS-only installs often stay "not verified").
+ */
+function withGoogleAdsTag(html) {
+  if (!GOOGLE_ADS_ID) return html;
+  if (html.includes("data-em-ads-base") || html.includes(`gtag/js?id=${GOOGLE_ADS_ID}`)) {
+    return html;
+  }
+  const snippet = `
+    <!-- Google tag (gtag.js) Ads base — data-em-ads-base -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}" data-em-ads-base="1"></script>
+    <script data-em-ads-base="1">
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '${GOOGLE_ADS_ID}');
+    </script>`;
+  // Prefer right after the consent bootstrap so Consent Mode still applies.
+  if (/gtag\('consent',\s*'default'/i.test(html)) {
+    return html.replace(
+      /(<script>\s*window\.dataLayer[\s\S]*?gtag\('consent',\s*'default'[\s\S]*?<\/script>)/i,
+      `$1\n${snippet}`
+    );
+  }
+  return html.replace(/<\/head>/i, `${snippet}\n  </head>`);
+}
+
 function sendPage(res, file, req) {
   const htmlPath = path.join(root, file);
   let html = fs.readFileSync(htmlPath, "utf8");
@@ -77,7 +106,7 @@ function sendPage(res, file, req) {
   const langParam = req && req.query && typeof req.query.lang === "string" ? req.query.lang : "en";
   const lang = ["en", "fr", "de", "es", "ar"].includes(langParam) ? langParam : "en";
   html = withCrawlerSeo(html, { path: pathName, lang });
-  html = withAssetVersion(withSeoIcons(html));
+  html = withAssetVersion(withSeoIcons(withGoogleAdsTag(html)));
   res.setHeader("Cache-Control", "no-cache");
   res.type("html").send(html);
 }
