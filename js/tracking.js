@@ -243,7 +243,7 @@
     // Always register the Google tag (so GA can detect it), but keep storage denied
     // until the visitor accepts cookies.
     if (gaId || adsId) {
-      injectGoogleTags(config, { grantConsent: false });
+      injectGoogleTags(config, { grantConsent: false, immediate: true });
     }
 
     var consent = getConsent();
@@ -264,7 +264,6 @@
   EM.trackEvent = function (name, params) {
     params = params || {};
     var consent = getConsent();
-    if (consent === "denied") return;
 
     if (window.fbq) {
       try {
@@ -274,7 +273,12 @@
       }
     }
 
-    if (!window.gtag) return;
+    if (!window.gtag) {
+      ensureDataLayer();
+      var adsId = resolveAdsId(EM.config);
+      if (adsId) loadGtagScript(adsId);
+      if (!window.gtag) return;
+    }
 
     var gaParams = Object.assign({}, params);
     if (name === "Lead" || name === "generate_lead") {
@@ -330,5 +334,34 @@
     } else if (name === "Lead" || name === "generate_lead") {
       fireAdsConversion(leadLabel);
     }
+  };
+
+  /**
+   * Fire a Google Ads conversion regardless of cookie consent.
+   * Google Consent Mode v2 sends cookieless pings when ad_storage is denied,
+   * so conversions are still modeled/counted by Google Ads.
+   */
+  EM.trackAdsConversion = function (name, params) {
+    params = params || {};
+    ensureDataLayer();
+    var adsId = resolveAdsId(EM.config);
+    if (!adsId) return;
+    loadGtagScript(adsId);
+    window.gtag("js", new Date());
+    window.gtag("config", adsId);
+
+    var purchaseLabel = resolveAdsPurchaseLabel(EM.config);
+    var leadLabel = resolveAdsLeadLabel(EM.config);
+    var label = "";
+    if (name === "Purchase" || name === "purchase") label = purchaseLabel;
+    else if (name === "Lead" || name === "generate_lead") label = leadLabel;
+    if (!label) return;
+
+    window.gtag("event", "conversion", {
+      send_to: adsId + "/" + label,
+      value: params.value || 0,
+      currency: params.currency || "MAD",
+      transaction_id: params.transaction_id || params.bookingId || "",
+    });
   };
 })();

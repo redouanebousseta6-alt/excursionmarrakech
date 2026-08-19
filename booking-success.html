@@ -153,6 +153,12 @@
               transaction_id: b.id,
               bookingId: b.id,
             });
+            EM.trackAdsConversion("Purchase", {
+              value: b.totalAmount,
+              currency: "MAD",
+              transaction_id: b.id,
+              bookingId: b.id,
+            });
           } else if (b.status === "inquiry") {
             document.title = "Inquiry received | excursionmarrakech";
             document.getElementById("success-title").textContent = "Inquiry received";
@@ -160,6 +166,9 @@
               "Thanks! We emailed you a copy of this inquiry. Our team will confirm availability and get back to you soon.";
             EM.trackEvent("Lead", {
               content_name: b.tripTitle,
+              bookingId: b.id,
+            });
+            EM.trackAdsConversion("Lead", {
               bookingId: b.id,
             });
           } else {
